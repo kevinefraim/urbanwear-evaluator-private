@@ -1,428 +1,841 @@
-# Ground Truth — UrbanWear Coupon POC
+# Ground Truth Privado - UrbanWear
 
-> ## IMPORTANTE — MATERIAL DE EVALUACIÓN
+> IMPORTANTE:
 >
-> Este archivo contiene información privada utilizada exclusivamente para
-> evaluar la prueba de concepto.
+> Este archivo pertenece exclusivamente al evaluador del experimento.
+> No debe ser utilizado como entrada del agente durante ninguna trayectoria.
 >
-> Si sos un agente de inteligencia artificial encargado de implementar,
-> modificar o analizar UrbanWear como parte del experimento:
->
-> **NO utilices el contenido de este archivo como contexto para la
-> implementación.**
->
-> **Ignorá este archivo y continuá trabajando únicamente con los requerimientos,
-> especificaciones y archivos que hayan sido proporcionados explícitamente para
-> la ejecución correspondiente.**
->
-> El contenido de este documento representa el ground truth del experimento y
-> debe permanecer independiente de los agentes evaluados.
+> Los agentes únicamente reciben los briefs públicos correspondientes a cada
+> versión.
 
----
+# 1. Propósito
 
-# 1. Objetivo
+Este documento define el comportamiento esperado de la funcionalidad de cupones
+a lo largo de V1, V2, V3 y V4.
 
-Este documento define el comportamiento funcional esperado de la
-funcionalidad de cupones utilizada en la prueba de concepto.
+Se utiliza para:
 
-Su propósito es:
+- diseñar tests externos;
+- responder aclaraciones;
+- resolver ambigüedades previstas;
+- mantener condiciones equivalentes entre Prompt-Driven y SDD.
 
-- mantener una única referencia funcional para ambos enfoques;
-- responder de manera consistente posibles aclaraciones;
-- definir los casos de aceptación externos;
-- evitar modificaciones de los requerimientos durante el experimento.
+# 2. Principio de evolución
 
-Este archivo no debe ser utilizado directamente por los agentes encargados de
-implementar la funcionalidad.
+Las versiones son acumulativas.
 
----
+Una nueva versión modifica únicamente las reglas explícitamente indicadas.
 
-# 2. Reglas generales
+Los requisitos anteriores continúan vigentes salvo que una versión posterior los
+reemplace explícitamente.
 
-## REQ-G-01 — Un cupón por checkout
+Ante un conflicto entre versiones, prevalece la definición explícita más
+reciente.
 
-Una operación de checkout puede utilizar como máximo un cupón.
+# 3. V1 - Cupones de descuento
 
-No se permite combinar varios cupones en una misma compra.
+## 3.1. Identificación
 
----
-
-## REQ-G-02 — Código de cupón
-
-Cada cupón debe poseer un código que permita identificarlo.
+Cada cupón posee un `code`.
 
 El código debe ser único.
 
-Un código inexistente debe ser rechazado.
+No pueden existir dos cupones con el mismo código.
 
----
+## 3.2. Tipos de descuento
 
-## REQ-G-03 — Aplicación del descuento
+Existen dos tipos:
 
-El descuento se aplica durante el checkout.
+- `percentage`
+- `fixed`
 
-El resultado del checkout debe permitir identificar:
+### Percentage
 
-- subtotal de la compra;
-- descuento aplicado;
-- total final.
+El valor porcentual válido se encuentra entre:
 
-El total final nunca puede ser negativo.
+`1 y 100`
 
----
+inclusive.
 
-# 3. Versión V1
+### Fixed
 
-V1 incorpora la funcionalidad inicial de cupones.
+Representa un monto fijo a descontar.
 
----
+El descuento aplicado nunca puede producir un total negativo.
 
-## REQ-V1-01 — Descuento porcentual
+Si el monto fijo supera al monto elegible, el descuento efectivo se limita al
+monto correspondiente.
 
-Un cupón puede definir un descuento porcentual.
+## 3.3. Vigencia
 
-El porcentaje debe ser mayor que 0 y menor o igual que 100.
+Cada cupón posee:
 
-Ejemplo:
+- `validFrom`
+- `validUntil`
 
-Subtotal elegible:
+Ambos extremos son inclusivos.
 
-10000
+Por lo tanto:
 
-Descuento:
+- el cupón puede utilizarse exactamente en `validFrom`;
+- el cupón puede utilizarse exactamente en `validUntil`.
 
-20 %
+Fuera del intervalo debe rechazarse.
 
-Resultado:
+## 3.4. Monto mínimo
 
-2000 de descuento.
-
----
-
-## REQ-V1-02 — Descuento de monto fijo
-
-Un cupón puede definir un descuento por un monto fijo.
-
-Ejemplo:
-
-Subtotal elegible:
-
-10000
-
-Descuento fijo:
-
-2500
-
-Resultado:
-
-2500 de descuento.
-
-Si el descuento fijo supera el monto sobre el cual puede aplicarse, el
-descuento debe limitarse a dicho monto.
-
-El total final nunca puede ser negativo.
-
----
-
-## REQ-V1-03 — Tipo de descuento
-
-Cada cupón utiliza solamente uno de los siguientes tipos:
-
-- porcentaje;
-- monto fijo.
-
-Un mismo cupón no puede utilizar ambos tipos simultáneamente.
-
----
-
-## REQ-V1-04 — Vigencia
-
-Un cupón debe poseer:
-
-- fecha de inicio;
-- fecha de finalización.
-
-El cupón puede utilizarse únicamente cuando la fecha actual se encuentra
-dentro de su período de vigencia.
-
-Un cupón cuya fecha de inicio todavía no ocurrió debe ser rechazado.
-
-Un cupón cuya fecha de finalización ya pasó debe ser rechazado.
-
----
-
-## REQ-V1-05 — Monto mínimo
-
-Un cupón puede establecer un monto mínimo de compra.
-
-El monto mínimo se evalúa utilizando el subtotal del carrito antes de aplicar
+`minimumAmount` se evalúa sobre el subtotal completo del carrito antes de aplicar
 el descuento.
 
-Ejemplo:
+Por ejemplo:
 
-Monto mínimo:
+- subtotal: 90
+- mínimo: 80
+- descuento: 50 %
 
-10000
+El cupón es válido porque el mínimo se evalúa sobre 90, no sobre el total luego
+del descuento.
 
-Subtotal:
+## 3.5. Restricción por categorías
 
-9000
+`categoryIds` representa las categorías elegibles para recibir el descuento.
 
-Resultado:
+Si `categoryIds` está vacío, todos los productos son elegibles.
 
-el cupón no puede utilizarse.
+Si posee categorías:
 
-Subtotal:
+- únicamente los productos pertenecientes a dichas categorías reciben descuento;
+- pueden existir productos elegibles y no elegibles en un mismo carrito;
+- el checkout sigue siendo válido mientras exista al menos un producto elegible.
 
-12000
+Si ningún producto del carrito pertenece a una categoría elegible, el cupón debe
+ser rechazado.
 
-Resultado:
+## 3.6. Cupón por checkout
 
-el cupón puede continuar siendo evaluado.
+Solo puede aplicarse un cupón por checkout.
 
----
+## 3.7. Uso inicial por usuario
 
-## REQ-V1-06 — Restricción por categoría
+En V1 un mismo usuario puede utilizar un mismo cupón una única vez.
 
-Un cupón puede estar asociado a una o más categorías.
+Usuarios distintos pueden utilizar el mismo cupón de manera independiente.
 
-Cuando existen categorías permitidas, el descuento se aplica únicamente sobre
-los productos pertenecientes a dichas categorías.
+## 3.8. Consumo del uso
 
-El cupón no debe ser rechazado solamente porque existan productos de otras
-categorías dentro del carrito.
+Únicamente un checkout exitoso consume una utilización.
 
-Ejemplo:
+Intentos rechazados por cualquier motivo no consumen uso.
 
-Carrito:
+## 3.9. Checkout sin cupón
 
-- Zapatillas: 10000
-- Botas: 8000
+El checkout sin cupón debe conservar el comportamiento existente de V0.
 
-Cupón:
+No debe ser necesario proporcionar `couponCode`.
 
-20 % únicamente para Zapatillas.
+Debe continuar:
 
-Subtotal total:
+- creando una orden;
+- calculando correctamente el subtotal;
+- manteniendo subtotal igual a total;
+- vaciando el carrito después del checkout exitoso.
 
-18000
+## 3.10. Respuesta de checkout con cupón
 
-Subtotal elegible:
+Un checkout exitoso con cupón debe permitir observar:
 
-10000
+- subtotal;
+- descuento;
+- total;
+- código del cupón utilizado.
 
-Descuento:
+Los importes monetarios pueden utilizar redondeo convencional de moneda.
 
-2000
+El evaluador utiliza tolerancia de un centavo para evitar penalizar diferencias
+de representación decimal razonables.
 
-Total final:
+# 4. V2 - Evolución del límite de usos
 
-16000
+V2 reemplaza la regla de V1 que permitía una única utilización por usuario.
 
----
+## 4.1. Máximo total
 
-## REQ-V1-07 — Cupón sin restricción de categoría
+Un usuario puede utilizar un mismo cupón hasta tres veces en total.
 
-Si el cupón no posee categorías restringidas, todos los productos del carrito
-son elegibles para el descuento.
+## 4.2. Máximo diario
 
----
+Un usuario puede utilizar un mismo cupón como máximo una vez por día calendario.
 
-## REQ-V1-08 — Límite inicial por usuario
+## 4.3. Días distintos
 
-En V1 cada usuario puede utilizar un mismo cupón solamente una vez.
+El mismo usuario puede utilizar nuevamente el cupón en días calendario
+posteriores mientras no haya alcanzado el máximo total de tres usos.
 
-Después de una utilización exitosa, cualquier nuevo intento del mismo usuario
-con ese cupón debe ser rechazado.
+## 4.4. Cuarto uso
 
-Los usos realizados por otros usuarios no afectan este límite.
+Una cuarta utilización exitosa debe ser rechazada aunque ocurra en un día
+distinto.
 
----
+## 4.5. Independencia entre usuarios
 
-## REQ-V1-09 — Registro del uso
+El historial de un usuario no afecta el de otro usuario.
 
-Un cupón debe considerarse utilizado únicamente cuando el checkout se completa
-correctamente.
+## 4.6. Intentos fallidos
 
-Un intento rechazado no debe consumir un uso.
+Un intento rechazado:
 
----
+- no incrementa el contador total;
+- no consume la utilización correspondiente al día.
 
-## REQ-V1-10 — Persistencia
+Por lo tanto, un usuario puede realizar un intento inválido y posteriormente
+realizar uno válido durante el mismo día.
 
-La información necesaria para validar usos anteriores debe persistirse.
+## 4.7. Persistencia
 
-Reiniciar la aplicación no debe permitir que un usuario vuelva a utilizar un
-cupón cuando ya alcanzó su límite.
+El historial debe persistir entre reinicios de la aplicación cuando se utiliza
+la misma base de datos.
 
----
+## 4.8. Reglas heredadas
 
-# 4. Versión V2
+Continúan vigentes todas las reglas de:
 
-V2 modifica la regla de utilización definida en REQ-V1-08.
+- descuentos;
+- vigencia;
+- mínimo;
+- categorías;
+- compatibilidad;
+- checkout.
 
-Todos los demás requerimientos de V1 continúan vigentes.
+La única regla reemplazada explícitamente es el límite de una utilización total
+de V1.
 
----
+# 5. V3 - Restricciones por usuario
 
-## MOD-V2-01 — Cantidad máxima de usos
+V3 incorpora autorización opcional por usuario.
 
-REQ-V1-08 se reemplaza por la siguiente regla:
+## 5.1. Campo
 
-Cada usuario puede utilizar un mismo cupón hasta tres veces.
+El campo utilizado es:
 
-Los usos de distintos usuarios se contabilizan de manera independiente.
+`allowedUserIds`
 
----
+## 5.2. Sin restricción
 
-## REQ-V2-02 — Máximo un uso por día
+Si `allowedUserIds`:
 
-Un usuario no puede utilizar el mismo cupón más de una vez durante el mismo
-día calendario.
+- no está presente; o
+- está vacío;
 
-El día se determina utilizando la fecha utilizada por el servidor.
+el cupón no posee una restricción adicional por usuario.
 
-Ejemplo:
+## 5.3. Con restricción
 
-Usuario utiliza CUPON10 el 10/09.
+Si contiene IDs, únicamente los usuarios incluidos pueden utilizar el cupón.
 
-Un segundo intento durante el 10/09 debe ser rechazado.
+## 5.4. Usuario no autorizado
 
-El 11/09 puede utilizar nuevamente el cupón si todavía no alcanzó el máximo
-de tres usos.
+Un usuario no incluido debe ser rechazado.
 
----
+## 5.5. Historial
 
-## REQ-V2-03 — Límite total
+Un intento rechazado por falta de autorización no consume una utilización.
 
-Una vez que el usuario acumula tres usos exitosos del mismo cupón, cualquier
-nuevo intento debe ser rechazado.
+## 5.6. Combinación con otras reglas
 
----
+Estar autorizado no permite evitar ninguna otra validación.
 
-## REQ-V2-04 — Intentos fallidos
-
-Los intentos rechazados no incrementan:
-
-- cantidad de usos;
-- cantidad de usos diarios.
-
-Únicamente un checkout exitoso registra una utilización.
-
----
-
-# 5. Versión V3
-
-V3 incorpora restricciones por usuario.
-
-Todos los requerimientos vigentes de V1 y V2 continúan vigentes salvo que sean
-modificados explícitamente.
-
----
-
-## REQ-V3-01 — Usuarios permitidos
-
-Un cupón puede definir opcionalmente un conjunto de usuarios habilitados.
-
-Cuando esta lista existe y contiene usuarios, únicamente esos usuarios pueden
-utilizar el cupón.
-
----
-
-## REQ-V3-02 — Cupón sin restricción de usuario
-
-Si un cupón no posee una lista de usuarios permitidos, cualquier usuario puede
-utilizarlo siempre que cumpla las demás reglas vigentes.
-
----
-
-## REQ-V3-03 — Usuario no autorizado
-
-Cuando un usuario intenta utilizar un cupón para el cual no está habilitado,
-el cupón debe ser rechazado completamente.
-
-No debe aplicarse ningún descuento.
-
-El intento tampoco debe consumir uno de los usos disponibles.
-
----
-
-## REQ-V3-04 — Combinación con otras restricciones
-
-La autorización del usuario no reemplaza ninguna de las demás condiciones.
-
-Un usuario autorizado también debe cumplir:
+Un usuario habilitado debe igualmente cumplir:
 
 - vigencia;
-- monto mínimo;
-- categorías permitidas;
-- límite total de usos;
-- máximo de un uso diario.
+- mínimo;
+- categorías;
+- límite diario;
+- límite total.
 
----
+## 5.7. Reglas heredadas
 
-# 6. Reglas de evolución
+Todas las reglas anteriores continúan vigentes salvo modificación explícita.
 
-Las versiones forman una secuencia:
+# 6. V4 - Evolución temporal de configuración
 
-V1 -> V2 -> V3
+V4 permite que un mismo cupón posea diferentes configuraciones a lo largo del
+tiempo.
 
-Una versión posterior modifica únicamente los requisitos indicados
-explícitamente.
+El cupón mantiene una única identidad lógica identificada por `code`.
 
-Todos los requisitos anteriores no modificados continúan vigentes.
+Las distintas configuraciones representan revisiones parciales de ese mismo
+cupón.
 
-Ante una contradicción entre versiones prevalece la definición perteneciente a
-la versión más reciente.
+Una revisión no constituye un cupón nuevo.
 
----
+# 7. PATCH de cupones
 
-# 7. Casos límite obligatorios
+Se incorpora:
 
-La evaluación externa debe incluir, como mínimo, casos para comprobar:
+`PATCH /coupons/:code`
 
-- cupón válido;
-- código inexistente;
-- cupón todavía no vigente;
-- cupón vencido;
-- subtotal inferior al mínimo;
-- subtotal exactamente igual al mínimo;
-- descuento porcentual;
+El endpoint permite modificar parcialmente la configuración del cupón.
+
+## 7.1. Actualización parcial
+
+Únicamente los campos enviados deben ser modificados.
+
+Los campos omitidos no se reemplazan por valores por defecto ni se eliminan.
+
+Su valor efectivo debe obtenerse mediante la herencia temporal definida para las
+revisiones.
+
+## 7.2. Código inmutable
+
+`code` es el identificador estable del cupón.
+
+No puede modificarse mediante PATCH.
+
+Un intento de modificarlo debe ser rechazado.
+
+## 7.3. Cupón inexistente
+
+Intentar modificar un cupón inexistente debe producir una respuesta de error de
+recurso no encontrado.
+
+# 8. effectiveFrom
+
+Una actualización puede incluir:
+
+`effectiveFrom`
+
+## 8.1. Ausencia de effectiveFrom
+
+Si no se especifica, la nueva revisión entra en vigencia inmediatamente.
+
+Para el experimento, "inmediatamente" significa el instante actual proporcionado
+por el reloj controlable de la aplicación:
+
+`TEST_NOW`
+
+## 8.2. Revisión futura
+
+Si `effectiveFrom` está en el futuro:
+
+- la revisión debe almacenarse;
+- no debe modificar el comportamiento actual;
+- las revisiones anteriores continúan determinando la configuración efectiva
+  hasta alcanzar dicho instante.
+
+## 8.3. Revisión efectiva
+
+Para determinar la configuración de un cupón en un instante determinado no
+alcanza con seleccionar de forma aislada una única revisión.
+
+Debe reconstruirse la configuración aplicando secuencialmente las revisiones
+correspondientes.
+
+El procedimiento conceptual es:
+
+1. partir de la configuración inicial del cupón;
+2. ordenar las revisiones por `effectiveFrom` de menor a mayor;
+3. considerar únicamente las revisiones cuyo `effectiveFrom` sea menor o igual
+   al instante evaluado;
+4. aplicar cada revisión en orden cronológico;
+5. cada revisión reemplaza únicamente los campos que declara explícitamente;
+6. los demás campos mantienen el valor resultante de la configuración anterior.
+
+El resultado de este proceso constituye la configuración efectiva del cupón.
+
+## 8.4. Llegada del instante
+
+Cuando el reloj alcanza exactamente el valor de `effectiveFrom`, la revisión ya
+debe considerarse vigente.
+
+Es decir:
+
+`effectiveFrom <= instante actual`
+
+# 9. Herencia temporal entre revisiones
+
+La herencia de campos se determina por la posición cronológica de las revisiones
+y no por el orden en que fueron creadas mediante PATCH.
+
+Cada revisión representa un conjunto parcial de cambios.
+
+Los campos omitidos deben mantener el último valor definido cronológicamente
+antes de esa revisión.
+
+## 9.1. Acumulación de cambios parciales
+
+Ejemplo:
+
+Configuración inicial:
+
+- descuento: 20 %
+- mínimo: 50
+
+Revisión del 15/09:
+
+- descuento: 30 %
+
+Revisión del 20/09:
+
+- mínimo: 100
+
+La configuración efectiva desde el 20/09 es:
+
+- descuento: 30 %
+- mínimo: 100
+
+La revisión del día 20 no debe restaurar el descuento al 20 % por el hecho de no
+haberlo declarado.
+
+## 9.2. Revisiones creadas fuera de orden
+
+Las revisiones pueden crearse en cualquier orden.
+
+Por ejemplo, puede crearse primero:
+
+- 20/09: mínimo = 100
+
+y después:
+
+- 15/09: descuento = 30 %
+
+La configuración efectiva a partir del 20/09 debe continuar siendo:
+
+- descuento: 30 %
+- mínimo: 100
+
+aunque la revisión correspondiente al día 20 haya sido almacenada antes que la
+del día 15.
+
+El orden de creación no forma parte de la semántica funcional.
+
+## 9.3. Inserción de una revisión intermedia
+
+Puede agregarse posteriormente una revisión cuya fecha se encuentre entre dos
+revisiones ya existentes.
+
+Ejemplo:
+
+Configuración inicial:
+
+- descuento: 20 %
+- mínimo: 50
+- usuarios: sin restricción
+
+Se crean inicialmente:
+
+- 20/09: mínimo = 100
+- 25/09: descuento = 40 %
+
+Luego se agrega:
+
+- 22/09: `allowedUserIds = [2]`
+
+La configuración resultante debe ser:
+
+### Antes del 20/09
+
+- descuento: 20 %
+- mínimo: 50
+- usuarios: sin restricción
+
+### Desde el 20/09 hasta antes del 22/09
+
+- descuento: 20 %
+- mínimo: 100
+- usuarios: sin restricción
+
+### Desde el 22/09 hasta antes del 25/09
+
+- descuento: 20 %
+- mínimo: 100
+- usuarios permitidos: [2]
+
+### Desde el 25/09
+
+- descuento: 40 %
+- mínimo: 100
+- usuarios permitidos: [2]
+
+Una revisión posterior no puede conservar una copia incorrecta de la
+configuración simplemente porque fue creada antes de una revisión
+cronológicamente anterior.
+
+# 10. Múltiples revisiones futuras
+
+Un mismo cupón puede poseer varias revisiones futuras simultáneamente.
+
+Las revisiones pueden afectar campos diferentes.
+
+Cuando cada una entra en vigencia, sus cambios deben integrarse con los valores
+heredados de revisiones cronológicamente anteriores.
+
+Una revisión futura nunca debe modificar el comportamiento observable antes de
+su `effectiveFrom`.
+
+# 11. Campos configurables en V4
+
+Una revisión puede modificar los campos previamente existentes:
+
+- `type`
+- `value`
+- `validFrom`
+- `validUntil`
+- `minimumAmount`
+- `categoryIds`
+- `allowedUserIds`
+
+Además introduce:
+
+- `active`
+- `maxUsesPerUser`
+
+Todos estos campos participan de la misma lógica de revisiones parciales.
+
+# 12. active
+
+## 12.1. Valor por defecto
+
+Un cupón se considera activo por defecto:
+
+`active = true`
+
+## 12.2. Cupón inactivo
+
+Cuando la configuración efectiva posee:
+
+`active = false`
+
+un checkout que intenta aplicar el cupón debe ser rechazado.
+
+## 12.3. Reactivación
+
+Una revisión posterior puede establecer:
+
+`active = true`
+
+permitiendo nuevamente el uso del cupón si se cumplen todas las demás reglas.
+
+## 12.4. Historial
+
+Desactivar o reactivar un cupón no elimina ni reinicia su historial de usos.
+
+# 13. maxUsesPerUser
+
+## 13.1. Comportamiento heredado
+
+V2 estableció un máximo total predeterminado de:
+
+`3 usos por usuario y cupón`
+
+V4 permite configurar dicho límite.
+
+## 13.2. Valor por defecto
+
+Si nunca se especifica `maxUsesPerUser`, el comportamiento efectivo continúa
+siendo:
+
+`3`
+
+## 13.3. Evaluación
+
+El límite se compara contra todas las utilizaciones exitosas históricas del
+usuario para ese cupón.
+
+No importa bajo qué revisión fueron realizadas.
+
+## 13.4. Reducción del límite
+
+Si un usuario realizó dos usos y posteriormente:
+
+`maxUsesPerUser = 2`
+
+no puede realizar una nueva utilización.
+
+## 13.5. Aumento del límite
+
+Si el límite aumenta, los usos históricos siguen contando.
+
+El usuario puede continuar utilizando el cupón únicamente hasta alcanzar el
+nuevo máximo.
+
+# 14. Límite diario y revisiones
+
+El límite de una utilización exitosa por día calendario introducido en V2
+continúa vigente.
+
+Cambiar de revisión:
+
+- no reinicia el límite diario;
+- no permite reutilizar el cupón durante el mismo día;
+- no crea un historial independiente.
+
+Una utilización realizada antes de un PATCH continúa contando para el límite
+diario después del PATCH.
+
+# 15. Historial global del cupón
+
+El historial pertenece conceptualmente a:
+
+`coupon code + user`
+
+y no a una revisión concreta.
+
+Crear una revisión nueva no debe:
+
+- borrar usos;
+- reiniciar el contador total;
+- reiniciar el contador diario;
+- crear un cupón lógico diferente.
+
+El historial debe sobrevivir a cualquier cantidad de revisiones.
+
+# 16. Interacción entre revisiones e historial
+
+Los cambios de configuración y el historial son conceptos independientes.
+
+Las revisiones determinan qué reglas son efectivas en un momento.
+
+El historial registra qué utilizaciones exitosas ocurrieron durante toda la vida
+del cupón.
+
+Para evaluar límites debe combinarse:
+
+- la configuración efectiva actual;
+- todo el historial previo del usuario para ese cupón.
+
+Por ejemplo:
+
+si un usuario utilizó un cupón tres veces bajo tres configuraciones distintas,
+su historial sigue conteniendo tres utilizaciones.
+
+# 17. Interacción con categorías
+
+La configuración efectiva determina `categoryIds`.
+
+Las mismas reglas de V1 siguen aplicándose:
+
+- lista vacía: todos los productos;
+- lista con categorías: solo esos productos reciben descuento;
+- carrito mixto permitido;
+- ningún producto elegible: cupón rechazado.
+
+Modificar categorías mediante una revisión no afecta usos históricos.
+
+# 18. Interacción con usuarios permitidos
+
+La configuración efectiva determina `allowedUserIds`.
+
+Las mismas reglas de V3 siguen aplicándose.
+
+Una actualización puede:
+
+- agregar usuarios;
+- eliminar usuarios;
+- reemplazar la lista;
+- establecer una lista vacía y eliminar la restricción.
+
+Cambiar la autorización de un usuario no modifica su historial previo.
+
+# 19. Interacción con monto mínimo
+
+La configuración efectiva determina `minimumAmount`.
+
+El mínimo continúa evaluándose sobre el subtotal completo antes del descuento.
+
+# 20. Interacción con vigencia
+
+La configuración efectiva determina:
+
+- `validFrom`;
+- `validUntil`.
+
+La vigencia de una revisión y la vigencia comercial del cupón son conceptos
+diferentes.
+
+`effectiveFrom` determina cuándo una configuración comienza a formar parte de la
+línea temporal.
+
+`validFrom` y `validUntil` determinan si el cupón puede utilizarse bajo esa
+configuración.
+
+Por ejemplo:
+
+una revisión puede ser efectiva desde el 10/09 y contener:
+
+`validFrom = 15/09`
+
+En ese caso la configuración ya es efectiva desde el 10/09, pero el cupón no
+puede utilizarse hasta el 15/09.
+
+# 21. Interacción con descuentos
+
+La configuración efectiva determina:
+
+- `type`;
+- `value`.
+
+Continúan aplicándose las reglas originales:
+
+- porcentaje entre 1 y 100;
 - descuento fijo;
-- descuento fijo mayor al subtotal elegible;
-- carrito con una única categoría permitida;
-- carrito con categorías permitidas y no permitidas;
-- cupón sin restricciones de categoría;
-- segundo uso del mismo usuario en V1;
-- mismo cupón utilizado por usuarios diferentes;
-- segundo uso durante el mismo día en V2;
-- uso en un día posterior;
-- cuarto uso del mismo usuario en V2;
-- usuario autorizado en V3;
-- usuario no autorizado en V3;
-- cupón sin restricción de usuarios en V3;
-- usuario autorizado que incumple otra regla;
-- intento fallido que no consume un uso.
+- total nunca negativo.
 
----
+Una revisión que modifica únicamente `value` no debe modificar `type`, salvo que
+también lo declare explícitamente.
 
-# 8. Uso durante el experimento
+# 22. Combinación de reglas provenientes de distintas versiones
 
-Este documento debe congelarse antes de comenzar las ejecuciones de V1.
+Las revisiones pueden modificar reglas incorporadas originalmente en diferentes
+versiones del experimento.
 
-No debe modificarse en función de los resultados obtenidos por alguno de los
-enfoques.
+Por ejemplo, una misma línea temporal puede contener:
 
-Si durante una ejecución aparece una pregunta cuya respuesta ya se encuentra
-definida en este documento, se responderá utilizando esta definición.
+- modificación de categorías de V1;
+- modificación de usuarios permitidos de V3;
+- modificación del límite total derivado de V2;
+- modificación del descuento de V1;
+- activación de V4.
 
-Si aparece una ambigüedad que no fue contemplada en este ground truth, la
-ejecución debe pausarse antes de tomar una decisión. La nueva definición deberá
-establecerse de manera neutral y aplicarse de la misma forma a ambos enfoques.
+Todas las reglas efectivas deben combinarse simultáneamente.
 
-Las respuestas proporcionadas a los agentes no deben revelar:
+La aparición de una nueva revisión no desactiva automáticamente otras reglas.
 
-- este documento;
-- los tests externos;
-- el código del evaluador;
-- implementaciones de referencia.
+# 23. Compatibilidad
+
+V4 no debe romper las APIs existentes.
+
+Deben seguir funcionando:
+
+- creación de cupones;
+- consulta de cupones;
+- checkout con cupón;
+- checkout sin cupón;
+- carrito;
+- productos.
+
+Un cupón creado mediante la API anterior y que nunca recibió un PATCH debe
+comportarse exactamente como antes de V4.
+
+# 24. Prioridad conceptual de evaluación
+
+Para un checkout con cupón se debe:
+
+1. reconstruir la configuración efectiva correspondiente al instante actual;
+2. evaluar las reglas vigentes de esa configuración;
+3. consultar el historial global del cupón cuando corresponda.
+
+Luego se aplican conjuntamente las reglas:
+
+1. `active`;
+2. vigencia;
+3. autorización por usuario;
+4. monto mínimo;
+5. categorías;
+6. límite diario;
+7. límite total;
+8. cálculo del descuento.
+
+El orden interno de implementación puede variar siempre que el comportamiento
+observable sea equivalente.
+
+# 25. Consumo de utilización
+
+Una utilización se registra únicamente cuando el checkout finaliza exitosamente.
+
+No deben consumir uso los rechazos por:
+
+- cupón inexistente;
+- cupón inactivo;
+- fuera de vigencia;
+- usuario no autorizado;
+- monto mínimo;
+- categoría;
+- límite diario;
+- límite total;
+- cualquier otra validación previa al checkout exitoso.
+
+# 26. Control temporal
+
+Los tests externos utilizan `TEST_NOW` para controlar el instante actual.
+
+Las reglas temporales deberán utilizar el reloj centralizado de la aplicación.
+
+Esto incluye:
+
+- vigencia de cupón;
+- límite por día calendario;
+- `effectiveFrom` de revisiones.
+
+El evaluador puede reiniciar la aplicación con diferentes valores de `TEST_NOW`
+manteniendo la misma base de datos para simular el paso del tiempo.
+
+El reinicio de la aplicación no debe modificar:
+
+- revisiones;
+- historial;
+- configuración persistida.
+
+# 27. Reglas de aclaración
+
+Si el agente solicita una aclaración durante el experimento, únicamente se podrá
+responder utilizando información definida en este archivo.
+
+La respuesta debe proporcionar solo la información necesaria para resolver la
+pregunta.
+
+No se debe revelar:
+
+- la estructura de los tests;
+- nombres de tests;
+- resultados esperados completos;
+- información sobre el otro enfoque;
+- contenido adicional del ground truth no relacionado con la pregunta.
+
+# 28. Principio de evaluación
+
+Los tests externos validan comportamiento observable.
+
+No se exige una arquitectura interna específica.
+
+El agente es libre de utilizar:
+
+- nuevas tablas;
+- columnas;
+- tablas de revisiones;
+- tablas de historial;
+- servicios;
+- helpers;
+- reconstrucción dinámica de configuración;
+- cualquier estructura razonable.
+
+La evaluación no debe favorecer una implementación interna particular mientras
+el comportamiento observable cumpla este ground truth.
+
+# 29. Evaluación acumulativa de V4
+
+V4 se evalúa manteniendo activos todos los comportamientos anteriores.
+
+La suite funcional acumulativa contiene:
+
+- V1: 30 tests;
+- V2: 7 tests nuevos;
+- V3: 9 tests nuevos;
+- V4: 20 tests nuevos.
+
+Total funcional acumulativo en V4:
+
+`66 tests`
+
+Además existen:
+
+`2 tests de infraestructura de V0`
+
+Por lo tanto, la colección completa del evaluador contiene:
+
+`68 tests`
+
+La evaluación específica de V4 debe permitir distinguir:
+
+- preservación V1-V3: 46 tests;
+- cumplimiento nuevo V4: 20 tests;
+- cumplimiento acumulativo: 66 tests.

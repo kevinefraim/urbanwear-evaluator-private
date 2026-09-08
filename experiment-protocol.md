@@ -1,343 +1,551 @@
-# UrbanWear SDD POC - Protocolo Experimental
+# Protocolo Experimental
 
 ## 1. Objetivo
 
 El objetivo del experimento es comparar dos formas de desarrollar y evolucionar
-una misma funcionalidad asistida por un agente de inteligencia artificial:
+una misma funcionalidad de software con asistencia de un agente basado en
+inteligencia artificial:
 
-1. desarrollo mediante interacciones sucesivas con prompts;
-2. desarrollo basado en Spec-Driven Development.
+1. desarrollo mediante interacciones sucesivas;
+2. desarrollo basado en Spec-Driven Development (SDD).
 
-La comparación se centrará en observar si conservar contexto estructurado y
-persistente mediante SDD produce diferencias medibles cuando una funcionalidad
-evoluciona a través de cambios sucesivos.
+El interés principal no consiste únicamente en evaluar si una primera
+implementación funciona correctamente, sino en analizar qué ocurre cuando la
+funcionalidad evoluciona a través de múltiples versiones y acumula reglas de
+negocio relacionadas entre sí.
 
-El experimento no parte de la suposición de que SDD debe obtener mejores
-resultados.
+La comparación busca observar si el contexto estructurado y persistente generado
+mediante SDD aporta beneficios durante la evolución de la funcionalidad frente a
+un enfoque donde el agente trabaja principalmente a partir del código existente
+y del requerimiento correspondiente a cada nueva versión.
 
-# 2. Caso de estudio
+## 2. Caso de estudio
 
-Se utilizará UrbanWear, un backend ficticio de una tienda de calzado urbano.
+El experimento utiliza UrbanWear, una tienda online ficticia dedicada a la venta
+de calzado urbano.
 
-El estado inicial del sistema se encuentra congelado mediante el tag:
+El backend inicial, denominado V0, incluye:
 
-urbanwear-v0
+- productos;
+- categorías;
+- usuarios;
+- carrito;
+- checkout simulado;
+- persistencia mediante SQLite.
 
-Este estado no contiene soporte para cupones.
+V0 no posee funcionalidad de cupones.
 
-Todas las ejecuciones del experimento deben comenzar a partir de este mismo
-baseline.
+El experimento parte siempre del mismo estado identificado mediante el tag:
 
-# 3. Enfoques evaluados
+`urbanwear-v0`
 
-## 3.1 Prompt-driven
+## 3. Enfoques comparados
 
-El agente podrá:
+### 3.1. Enfoque Prompt-Driven
 
-- inspeccionar el repositorio;
-- modificar código;
-- crear archivos;
-- ejecutar comandos;
-- ejecutar tests internos;
-- solicitar aclaraciones;
-- recibir pedidos de corrección.
+En este enfoque el agente recibe:
 
-No se utilizará una especificación estructurada y persistente de la
-funcionalidad.
-
-Cada nueva versión comenzará en una sesión nueva con el agente.
-
-El agente dispondrá de:
-
-- el código correspondiente a la versión anterior;
+- el repositorio correspondiente al estado actual de la funcionalidad;
 - el requerimiento correspondiente a la nueva versión.
 
-No dispondrá del historial de conversación de las versiones anteriores.
+Cada versión comienza en una sesión nueva del agente.
 
-## 3.2 Spec-Driven Development
+No se conserva el historial de conversación de versiones anteriores.
 
-El agente tendrá las mismas capacidades que en el enfoque Prompt-driven.
+El agente puede inspeccionar libremente el código existente para comprender el
+comportamiento previamente implementado.
 
-La diferencia será la utilización de los siguientes artefactos persistentes:
+No se mantiene deliberadamente una especificación estructurada y persistente de
+la funcionalidad entre versiones.
+
+### 3.2. Enfoque basado en SDD
+
+En este enfoque se utiliza el mismo agente, modelo y configuración.
+
+El agente recibe:
+
+- el repositorio correspondiente al estado actual;
+- exactamente el mismo requerimiento entregado al enfoque Prompt-Driven;
+- los artefactos SDD persistentes generados en versiones anteriores.
+
+El proceso se organiza mediante artefactos como:
 
 - especificación;
-- plan de implementación;
-- tareas.
+- plan;
+- tareas;
+- implementación;
+- validación.
 
-El proceso esperado será:
+Las nuevas versiones actualizan o extienden los artefactos existentes.
 
-requerimiento
--> especificación
--> plan
--> tareas
--> implementación
--> validación
+Los artefactos SDD deben representar explícitamente qué requisitos:
 
-Cada nueva versión comenzará también en una sesión nueva.
+- se agregan;
+- se modifican;
+- se eliminan;
+- continúan vigentes.
 
-Además del código y del nuevo requerimiento, el agente tendrá acceso a los
-artefactos SDD generados durante las versiones anteriores.
+El objetivo es que la información acumulada sobre la evolución de la
+funcionalidad permanezca disponible de manera estructurada.
 
-# 4. Evolución de la funcionalidad
+## 4. Trayectorias experimentales
 
-Cada trayectoria debe evolucionar de manera secuencial:
+Se utiliza una trayectoria independiente por enfoque.
 
-V1 -> V2 -> V3
+### Prompt-Driven
 
-## V1
+`V0 -> V1 -> V2 -> V3 -> V4`
 
-Implementación inicial de cupones.
+### SDD
+
+`V0 -> V1 -> V2 -> V3 -> V4`
+
+Ambas trayectorias comienzan exactamente desde `urbanwear-v0`.
+
+Dentro de cada trayectoria, el código producido por una versión constituye el
+punto de partida de la siguiente.
+
+Por ejemplo:
+
+`V1 -> V2 -> V3 -> V4`
+
+no representa cuatro implementaciones independientes, sino una única
+funcionalidad que evoluciona sucesivamente.
+
+Cada versión utiliza una nueva sesión del agente.
+
+## 5. Ajuste del diseño experimental
+
+Durante la ejecución inicial del enfoque Prompt-Driven se observó cumplimiento
+completo de los requisitos externos correspondientes a V1, V2 y V3, sin
+regresiones funcionales y sin necesidad de ciclos de corrección.
+
+Este comportamiento produjo un efecto techo en las primeras evoluciones, dado
+que las modificaciones eran suficientemente acotadas como para ser resueltas a
+partir del requerimiento actual y del código existente.
+
+Antes de ejecutar V4 en cualquiera de los dos enfoques se decidió incorporar una
+evolución adicional de mayor complejidad e interacción con requisitos
+anteriores.
+
+V4 fue definida y congelada antes de ser ejecutada por cualquiera de los dos
+enfoques.
+
+Asimismo, se decidió concentrar el experimento en una trayectoria longitudinal
+por enfoque en lugar de realizar múltiples repeticiones independientes.
+
+Esta decisión permite profundizar el análisis sobre la acumulación de contexto y
+la evolución de una misma funcionalidad, aunque limita la posibilidad de
+realizar inferencias estadísticas sobre la variabilidad entre ejecuciones.
+
+Esta limitación deberá ser considerada al interpretar los resultados.
+
+## 6. Versiones de la funcionalidad
+
+### V1 - Cupones de descuento
+
+Se incorpora la funcionalidad inicial de cupones.
 
 Incluye:
 
-- descuento porcentual;
-- descuento fijo;
-- período de vigencia;
+- descuentos porcentuales;
+- descuentos de monto fijo;
+- vigencia;
 - monto mínimo;
-- restricción por categoría;
-- límite de uso por usuario.
+- restricciones por categoría;
+- límite inicial de utilización por usuario;
+- compatibilidad con checkout sin cupón.
 
-## V2
+### V2 - Evolución de las restricciones de uso
 
-Modifica la política de uso.
+Se modifica la política de utilización.
 
-Cada usuario podrá utilizar un mismo cupón:
+Un usuario puede utilizar un mismo cupón:
 
 - hasta tres veces en total;
 - como máximo una vez por día calendario.
 
-Todos los demás requerimientos continúan vigentes.
+Los intentos rechazados no consumen una utilización.
 
-## V3
+Las utilizaciones son independientes entre usuarios.
 
-Agrega la posibilidad de restringir un cupón a determinados usuarios.
+### V3 - Restricción por usuarios habilitados
 
-Todos los requerimientos anteriores no modificados continúan vigentes.
+Se incorpora una lista opcional de usuarios autorizados.
 
-# 5. Trayectorias experimentales
+Si un cupón posee `allowedUserIds`, únicamente dichos usuarios pueden utilizarlo.
 
-Se realizarán cuatro trayectorias completas:
+Si la restricción no está presente, el cupón puede ser utilizado por cualquier
+usuario que cumpla el resto de las reglas.
 
-- prompt-run-1;
-- prompt-run-2;
-- sdd-run-1;
-- sdd-run-2.
+Esta autorización no reemplaza ni evita las validaciones anteriores.
 
-Cada trayectoria comenzará desde urbanwear-v0.
+### V4 - Evolución temporal de la configuración
 
-Cada trayectoria conservará únicamente el código producido por sus propias
-versiones anteriores.
+Se incorpora la posibilidad de modificar cupones existentes mediante revisiones
+de configuración.
 
-No se copiarán soluciones entre trayectorias.
+V4 introduce:
 
-# 6. Condiciones controladas
+- actualización parcial mediante `PATCH`;
+- cambios inmediatos;
+- cambios programados mediante `effectiveFrom`;
+- activación y desactivación;
+- límite total de usos configurable;
+- conservación del historial entre configuraciones;
+- interacción de las nuevas reglas con V1, V2 y V3.
 
-Las siguientes condiciones deben mantenerse iguales entre ambos enfoques:
+V4 representa la evolución de mayor complejidad del experimento.
+La complejidad de V4 incluye la existencia de múltiples revisiones futuras,
+la creación de revisiones fuera de orden cronológico y la herencia parcial de
+configuración según la línea temporal efectiva del cupón.
 
-- mismo código inicial;
-- mismo agente;
-- mismo modelo;
-- mismo nivel de razonamiento;
-- mismos requerimientos funcionales;
-- mismas dependencias iniciales;
-- mismo conjunto de datos iniciales;
-- mismas reglas de interacción humana;
-- misma suite externa de evaluación;
-- mismo máximo de ciclos de corrección.
+## 7. Condiciones controladas
 
-El modelo y la configuración seleccionados al iniciar el experimento no deben
-modificarse hasta finalizar las cuatro trayectorias.
+Ambos enfoques deberán utilizar:
 
-# 7. Interacción humana
+- el mismo proyecto V0;
+- el mismo modelo;
+- la misma configuración de razonamiento;
+- la misma herramienta/agente;
+- los mismos briefs;
+- las mismas dependencias iniciales;
+- la misma información disponible sobre UrbanWear;
+- la misma suite externa de aceptación;
+- las mismas reglas de intervención humana;
+- el mismo límite de ciclos de corrección.
 
-El desarrollador podrá:
+El modo de aprobación de acciones utilizado por el agente deberá mantenerse
+igual durante toda la experiencia.
 
-- enviar el requerimiento inicial;
+La suite externa no deberá ser visible para el agente.
+
+## 8. Entrega de requerimientos
+
+Existen cuatro archivos de entrada comunes:
+
+- `input-briefs/v1.md`
+- `input-briefs/v2.md`
+- `input-briefs/v3.md`
+- `input-briefs/v4.md`
+
+El contenido correspondiente a cada versión debe entregarse de forma idéntica a
+ambos enfoques.
+
+Los briefs representan los requerimientos conocidos por el agente.
+
+No deben incluir:
+
+- casos de prueba externos;
+- ground truth privado;
+- resultados de ejecuciones anteriores;
+- información sobre el desempeño del otro enfoque.
+
+## 9. Sesiones del agente
+
+Cada nueva versión comienza en una conversación nueva.
+
+Por lo tanto:
+
+- V1 usa una sesión nueva;
+- V2 usa otra sesión nueva;
+- V3 usa otra sesión nueva;
+- V4 usa otra sesión nueva.
+
+El historial conversacional de una versión anterior no se reutiliza.
+
+En Prompt-Driven, la continuidad se produce principalmente a través del código.
+
+En SDD, la continuidad se produce a través del código y de los artefactos SDD
+persistentes.
+
+## 10. Intervención humana
+
+El desarrollador no puede editar manualmente el código durante una ejecución.
+
+Puede:
+
 - responder preguntas del agente;
-- solicitar correcciones;
-- informar fallas funcionales detectadas por la evaluación externa.
+- aclarar requerimientos;
+- indicar errores detectados por el evaluador externo;
+- solicitar una nueva corrección.
 
-El desarrollador no podrá:
+Cada mensaje enviado por el desarrollador después del requerimiento inicial se
+considera una intervención humana.
 
-- modificar manualmente el código;
-- resolver errores directamente;
-- mostrar el código de los tests externos;
-- mostrar el ground truth;
-- entregar una implementación de referencia.
+Las aprobaciones automáticas de comandos o herramientas no cuentan como
+intervención humana.
 
-Cada mensaje enviado después del requerimiento inicial se contabilizará como
-una intervención humana.
+## 11. Resolución de ambigüedades
 
-# 8. Aclaraciones
+Las aclaraciones deberán basarse exclusivamente en el ground truth privado.
 
-Las aclaraciones deberán responderse utilizando exclusivamente el ground truth
-previamente definido.
+Si el agente realiza una pregunta cuyo comportamiento ya se encuentra definido
+en el ground truth, se deberá responder utilizando esa definición.
 
-Si ambos enfoques realizan la misma pregunta, deberán recibir la misma
-información funcional.
+La respuesta se registra como intervención humana.
 
-Si aparece una ambigüedad no contemplada en el ground truth:
+Si aparece una ambigüedad no prevista en el ground truth, el experimento deberá
+detenerse temporalmente.
 
-1. se pausa la ejecución;
-2. se define una respuesta neutral;
-3. la nueva regla se documenta;
-4. debe aplicarse de la misma manera a ambos enfoques.
+Se deberá establecer una regla neutral antes de continuar y dicha regla deberá
+aplicarse de igual manera a ambos enfoques.
 
-No se debe decidir una nueva regla en función del resultado obtenido por uno
+No se deberá crear una regla diferente luego de observar el resultado de alguno
 de los enfoques.
 
-# 9. Evaluación externa
+## 12. Evaluación externa
 
-La suite de aceptación será independiente del proyecto visible para el agente.
+La evaluación oficial se realiza mediante una suite de tests independiente del
+repositorio que modifica el agente.
 
-Los agentes no tendrán acceso a:
+El agente no tiene acceso a esta suite.
 
-- ground-truth.md;
-- tests externos;
-- evaluator;
-- resultados de otras ejecuciones.
+Los tests se ejecutan contra la API pública de UrbanWear.
 
-La evaluación se realizará mediante la API pública de UrbanWear.
+Se evalúa el comportamiento como caja negra.
 
-Los tests serán black-box y no dependerán de la estructura interna elegida por
-el agente.
+Los tests internos creados por el agente pueden utilizarse como herramienta de
+desarrollo, pero no forman parte de la medición oficial.
 
-# 10. Evaluación acumulativa
+## 13. Evaluación acumulativa
 
-Los tests serán acumulativos.
+Cada versión debe preservar los requisitos todavía vigentes de versiones
+anteriores.
 
-V1:
+Por este motivo, la suite es acumulativa.
 
-tests V1
+Cantidad de tests funcionales:
+
+- V1: 30
+- V2: 30 anteriores + 7 nuevos = 37
+- V3: 37 anteriores + 9 nuevos = 46
+- V4: 46 anteriores + 20 nuevos = 66
+
+Además existen tests de infraestructura asociados a V0 que no forman parte de la
+métrica funcional principal.
+
+## 14. Primer intento
+
+Cuando el agente informa que considera terminada una implementación, se registra
+el estado del repositorio antes de proporcionar cualquier resultado del
+evaluador.
+
+Sobre ese estado se ejecuta la suite externa.
+
+Este resultado constituye el `first attempt`.
+
+Debe preservarse mediante un commit y un tag específico.
+
+## 15. Ciclos de corrección
+
+Si existen tests fallidos, el agente puede recibir feedback y realizar hasta tres
+ciclos de corrección.
+
+Un ciclo de corrección comienza cuando se proporciona feedback al agente después
+de una ejecución del evaluador externo.
+
+Después de cada corrección se vuelve a ejecutar la suite.
+
+El máximo permitido es:
+
+`3 ciclos de corrección`
+
+Si luego del tercer ciclo siguen existiendo fallos, la versión se considera
+incompleta.
+
+La siguiente versión continúa a partir del estado real alcanzado.
+
+No se realizan reparaciones manuales para llevar el código artificialmente a un
+estado correcto.
+
+## 16. Correcciones del instrumento de evaluación
+
+Si durante una ejecución se detecta un defecto en la propia suite externa que
+penaliza un comportamiento válido no restringido por el requerimiento, la suite
+puede ser corregida únicamente si:
+
+- el problema pertenece al instrumento de evaluación;
+- el agente todavía no recibió feedback basado en dicho fallo;
+- la corrección se aplica posteriormente de manera idéntica a ambos enfoques;
+- la modificación queda documentada.
+
+Una corrección del evaluador no se considera ciclo de corrección del agente.
+
+## 17. Métricas
+
+### 17.1. Cumplimiento en primer intento
+
+Se calcula antes de entregar feedback externo al agente.
+
+`tests activos aprobados / total de tests activos`
+
+### 17.2. Cumplimiento final
+
+Se calcula después de finalizar la versión.
+
+`tests activos aprobados / total de tests activos`
+
+### 17.3. Preservación
+
+Para V2, V3 y V4 se mide cuántos tests correspondientes a versiones anteriores
+continúan funcionando.
+
+Ejemplos:
 
 V2:
 
-tests V1 + tests V2
+`tests V1 aprobados / 30`
 
 V3:
 
-tests V1 + tests V2 + tests V3
+`tests V1 + V2 aprobados / 37`
 
-Esto permitirá evaluar tanto la implementación del nuevo cambio como la
-preservación de comportamientos anteriores.
+V4:
 
-# 11. Ciclos de corrección
+`tests V1 + V2 + V3 aprobados / 46`
 
-Cuando el agente declare terminada una versión:
+### 17.4. Cumplimiento del nuevo cambio
 
-1. se ejecutará la suite externa;
-2. se registrarán los resultados;
-3. si existen fallas, se informará únicamente el comportamiento funcional que
-   no fue satisfecho;
-4. el agente podrá realizar una corrección;
-5. se ejecutará nuevamente la suite.
+Se mide únicamente sobre los tests introducidos por la versión actual.
 
-Se permitirá un máximo de tres ciclos de corrección por versión.
+V2:
 
-Si después del tercer ciclo continúan existiendo fallas, la versión será
-registrada como incompleta.
+`tests nuevos aprobados / 7`
 
-# 12. Continuidad entre versiones
+V3:
 
-Una versión incompleta no será corregida manualmente antes de continuar.
+`tests nuevos aprobados / 9`
 
-La siguiente versión deberá partir del estado realmente alcanzado por la
-trayectoria anterior.
+V4:
 
-Esto permite observar posibles efectos acumulativos durante la evolución.
+`tests nuevos aprobados / 20`
 
-# 13. Métricas
+### 17.5. Ciclos de corrección
 
-## 13.1 Cumplimiento funcional
+Cantidad de ciclos adicionales requeridos luego del primer intento.
 
-C = tests aprobados / tests activos
+### 17.6. Intervenciones humanas
 
-Se expresará como porcentaje.
-
-## 13.2 Preservación del comportamiento previo
-
-Para V2 y V3:
-
-P = tests anteriores aprobados / tests anteriores totales
-
-Se expresará como porcentaje.
-
-## 13.3 Ciclos de corrección
-
-Cantidad de iteraciones adicionales realizadas después de evaluar la primera
-implementación presentada por el agente.
-
-## 13.4 Intervenciones humanas
-
-Cantidad de mensajes enviados por el desarrollador después del requerimiento
+Cantidad de mensajes enviados por el desarrollador luego del requerimiento
 inicial.
 
-## 13.5 Tiempo
+### 17.7. Tiempo
 
-Se medirá desde el envío del requerimiento correspondiente a una versión hasta:
+Se registra el tiempo desde el envío del requerimiento de una versión hasta que:
 
-- superar la suite externa; o
-- alcanzar el máximo de tres ciclos de corrección.
+- la implementación satisface la suite externa; o
+- se alcanza el máximo de correcciones.
 
-El tiempo incluye interacción real con el agente.
+El tiempo de generación y mantenimiento de artefactos SDD forma parte del tiempo
+del enfoque SDD.
 
-Las interrupciones personales ajenas al experimento deben excluirse de la
-medición.
+### 17.8. Consumo del agente
 
-## 13.6 Uso del agente
+El consumo de tokens, créditos u otra métrica equivalente únicamente se registra
+si la herramienta utilizada expone dicha información de forma confiable y
+comparable.
 
-Se registrará consumo de tokens, créditos u otra métrica equivalente cuando la
-herramienta permita obtenerla de forma comparable.
+No se realizan estimaciones manuales.
 
-Si la herramienta no permite obtener este dato de manera confiable, la métrica
-será considerada opcional y no se estimará manualmente.
+## 18. Artefactos SDD
 
-# 14. Registro de cada ejecución
+En la trayectoria SDD deben conservarse de manera persistente los artefactos
+generados durante cada versión.
 
-Para cada combinación de trayectoria y versión deberán registrarse:
+La estructura exacta puede depender de la herramienta utilizada, pero deberá
+permitir identificar como mínimo:
 
-- approach;
-- run;
-- version;
+- especificación vigente;
+- modificaciones introducidas;
+- plan de implementación;
+- tareas;
+- relación entre versiones.
+
+Las especificaciones deberán evolucionar de manera incremental.
+
+Los requisitos no modificados explícitamente continúan activos.
+
+Cuando dos definiciones entren en conflicto, prevalece la modificación explícita
+más reciente.
+
+## 19. Registro de resultados
+
+Cada versión deberá contar con un archivo privado de resultados.
+
+Ejemplos:
+
+- `results/prompt-run-1-v1.md`
+- `results/prompt-run-1-v2.md`
+- `results/prompt-run-1-v3.md`
+- `results/prompt-run-1-v4.md`
+- `results/sdd-run-1-v1.md`
+- `results/sdd-run-1-v2.md`
+- `results/sdd-run-1-v3.md`
+- `results/sdd-run-1-v4.md`
+
+Cada archivo deberá registrar como mínimo:
+
+- enfoque;
+- versión;
 - hora de inicio;
-- hora de finalización;
-- tests aprobados;
-- tests totales;
-- tests previos aprobados;
-- tests previos totales;
+- hora del primer intento;
+- tiempo;
+- tests anteriores aprobados;
+- tests nuevos aprobados;
+- cumplimiento acumulativo;
+- intervenciones;
 - ciclos de corrección;
-- intervenciones humanas;
-- tiempo total;
-- uso del agente, si está disponible;
-- observaciones.
+- observaciones relevantes.
 
-También deberán conservarse las conversaciones completas con el agente cuando
-la herramienta permita exportarlas o registrarlas.
+## 20. Versionado
 
-# 15. Tests internos
+El estado del código deberá registrarse mediante Git.
 
-El agente podrá crear tests internos dentro del repositorio.
+Se utilizarán tags para identificar:
 
-Estos tests forman parte de su proceso de desarrollo.
+- baseline V0;
+- primer intento de cada versión;
+- estado final de cada versión.
 
-No serán utilizados como métrica oficial del experimento.
+Ejemplo:
 
-Los resultados oficiales serán los obtenidos mediante la suite externa.
+`prompt-run-1-v4-first`
 
-# 16. Finalización de una versión
+`prompt-run-1-v4-final`
 
-Una versión se considera válida cuando todos los tests externos activos son
-superados.
+Si una versión pasa completamente en el primer intento, ambos tags pueden apuntar
+al mismo commit.
 
-Una versión se considera incompleta cuando alcanza el máximo de tres ciclos de
-corrección y todavía existen tests externos fallidos.
+## 21. Interpretación de resultados
 
-# 17. Congelamiento del protocolo
+El experimento no presupone que SDD deba obtener mejores resultados.
 
-Este protocolo debe considerarse congelado antes de comenzar Prompt Run 1 V1.
+Son resultados válidos, entre otros:
 
-No deberá modificarse después de observar resultados parciales con el objetivo
-de favorecer o perjudicar alguno de los enfoques.
+- SDD obtiene mejor preservación;
+- SDD necesita menos correcciones;
+- SDD mejora su ventaja a medida que aumentan las evoluciones;
+- ambos enfoques alcanzan la misma calidad funcional;
+- Prompt-Driven resulta más rápido;
+- el costo adicional de SDD no produce una mejora observable;
+- las ventajas de SDD aparecen principalmente en trazabilidad y mantenimiento
+  del contexto.
 
-Cualquier modificación inevitable deberá documentarse explícitamente y
-justificarse en el análisis final de la prueba de concepto.
+La conclusión deberá basarse exclusivamente en los resultados observados.
+
+## 22. Limitaciones
+
+El experimento utiliza:
+
+- un único caso de estudio;
+- una única funcionalidad;
+- una trayectoria por enfoque;
+- un agente/modelo determinado;
+- un número limitado de evoluciones.
+
+Por lo tanto, los resultados no pretenden constituir evidencia estadística
+generalizable a todos los proyectos de software.
+
+El experimento debe interpretarse como un estudio experimental controlado dentro
+del contexto específico de UrbanWear.
