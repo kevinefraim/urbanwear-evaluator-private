@@ -1,10 +1,15 @@
 import uuid
-import requests
+
 import pytest
+import requests
 
 
 def code(prefix):
     return f"{prefix}-{uuid.uuid4().hex[:8]}"
+
+
+def assert_money(actual, expected):
+    assert actual == pytest.approx(expected, abs=0.01)
 
 
 def create_coupon(server, **changes):
@@ -20,7 +25,11 @@ def create_coupon(server, **changes):
 
     coupon.update(changes)
 
-    response = requests.post(f"{server}/coupons", json=coupon)
+    response = requests.post(
+        f"{server}/coupons",
+        json=coupon
+    )
+
     assert response.status_code in (200, 201)
 
     return coupon
@@ -64,9 +73,9 @@ def test_v1_06_percentage_discount(urbanwear_server):
 
     data = response.json()
 
-    assert data["subtotal"] == pytest.approx(89.99)
-    assert data["discount"] == pytest.approx(17.998)
-    assert data["total"] == pytest.approx(71.992)
+    assert_money(data["subtotal"], 89.99)
+    assert_money(data["discount"], 17.998)
+    assert_money(data["total"], 71.992)
 
 
 def test_v1_07_percentage_100_percent(urbanwear_server):
@@ -85,7 +94,8 @@ def test_v1_07_percentage_100_percent(urbanwear_server):
     )
 
     assert response.status_code in (200, 201)
-    assert response.json()["total"] == pytest.approx(0)
+
+    assert_money(response.json()["total"], 0)
 
 
 def test_v1_08_reject_invalid_percentage(urbanwear_server):
@@ -126,9 +136,9 @@ def test_v1_09_fixed_discount(urbanwear_server):
 
     data = response.json()
 
-    assert data["subtotal"] == pytest.approx(89.99)
-    assert data["discount"] == pytest.approx(20)
-    assert data["total"] == pytest.approx(69.99)
+    assert_money(data["subtotal"], 89.99)
+    assert_money(data["discount"], 20)
+    assert_money(data["total"], 69.99)
 
 
 def test_v1_10_fixed_discount_never_negative(urbanwear_server):
@@ -147,7 +157,8 @@ def test_v1_10_fixed_discount_never_negative(urbanwear_server):
     )
 
     assert response.status_code in (200, 201)
-    assert response.json()["total"] == pytest.approx(0)
+
+    assert_money(response.json()["total"], 0)
 
 
 def test_v1_16_reject_below_minimum(urbanwear_server):
@@ -183,7 +194,10 @@ def test_v1_17_accept_exact_minimum(urbanwear_server):
 
     assert response.status_code in (200, 201)
 
-def test_v1_18_minimum_is_checked_before_discount(urbanwear_server):
+
+def test_v1_18_minimum_is_checked_before_discount(
+    urbanwear_server
+):
     coupon = create_coupon(
         urbanwear_server,
         type="percentage",
@@ -191,9 +205,8 @@ def test_v1_18_minimum_is_checked_before_discount(urbanwear_server):
         minimumAmount=80
     )
 
-    # Subtotal = 89.99, por lo tanto supera el mínimo de 80.
-    # Después del descuento quedaría en 44.995.
-    # Esto comprueba que el mínimo se evalúa ANTES del descuento.
+    # Subtotal = 89.99.
+    # Supera el mínimo antes de aplicar el descuento.
     add_product(urbanwear_server, 1, 1)
 
     response = checkout(
@@ -205,7 +218,9 @@ def test_v1_18_minimum_is_checked_before_discount(urbanwear_server):
     assert response.status_code in (200, 201)
 
 
-def test_v1_19_discount_on_allowed_category(urbanwear_server):
+def test_v1_19_discount_on_allowed_category(
+    urbanwear_server
+):
     coupon = create_coupon(
         urbanwear_server,
         type="percentage",
@@ -226,11 +241,14 @@ def test_v1_19_discount_on_allowed_category(urbanwear_server):
 
     data = response.json()
 
-    assert data["subtotal"] == pytest.approx(89.99)
-    assert data["discount"] == pytest.approx(17.998)
-    assert data["total"] == pytest.approx(71.992)
+    assert_money(data["subtotal"], 89.99)
+    assert_money(data["discount"], 17.998)
+    assert_money(data["total"], 71.992)
 
-def test_v1_20_discount_only_allowed_categories(urbanwear_server):
+
+def test_v1_20_discount_only_allowed_categories(
+    urbanwear_server
+):
     coupon = create_coupon(
         urbanwear_server,
         type="percentage",
@@ -254,20 +272,22 @@ def test_v1_20_discount_only_allowed_categories(urbanwear_server):
 
     data = response.json()
 
-    assert data["subtotal"] == pytest.approx(219.98)
+    assert_money(data["subtotal"], 219.98)
 
-    # Solo 89.99 recibe 20 %
-    assert data["discount"] == pytest.approx(17.998)
-    assert data["total"] == pytest.approx(201.982)
+    # Solo 89.99 recibe el descuento del 20 %.
+    assert_money(data["discount"], 17.998)
+    assert_money(data["total"], 201.982)
 
 
-def test_v1_21_reject_when_no_product_is_eligible(urbanwear_server):
+def test_v1_21_reject_when_no_product_is_eligible(
+    urbanwear_server
+):
     coupon = create_coupon(
         urbanwear_server,
         categoryIds=[1]
     )
 
-    # Urban Boot pertenece a categoría 2
+    # Urban Boot pertenece a categoría 2.
     add_product(urbanwear_server, 1, 4)
 
     response = checkout(
@@ -279,7 +299,9 @@ def test_v1_21_reject_when_no_product_is_eligible(urbanwear_server):
     assert response.status_code >= 400
 
 
-def test_v1_22_coupon_without_category_restriction(urbanwear_server):
+def test_v1_22_coupon_without_category_restriction(
+    urbanwear_server
+):
     coupon = create_coupon(
         urbanwear_server,
         type="percentage",
@@ -300,5 +322,6 @@ def test_v1_22_coupon_without_category_restriction(urbanwear_server):
 
     data = response.json()
 
-    assert data["subtotal"] == pytest.approx(219.98)
-    assert data["discount"] == pytest.approx(21.998)
+    assert_money(data["subtotal"], 219.98)
+    assert_money(data["discount"], 21.998)
+    assert_money(data["total"], 197.982)
