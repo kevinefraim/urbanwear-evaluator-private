@@ -593,3 +593,9 @@ Además:
 Total:
 
 68 tests.
+
+## Día calendario
+
+Para aplicar el límite diario se utiliza el día calendario en UTC.
+
+El instante controlado mediante `TEST_NOW` determina el día correspondiente.
