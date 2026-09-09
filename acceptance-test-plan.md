@@ -1,538 +1,457 @@
 # UrbanWear POC - Plan de Pruebas de Aceptación
 
-## 1. Objetivo
+# 1. Objetivo
 
-La suite de aceptación constituye el mecanismo independiente utilizado para
-evaluar las implementaciones generadas durante la prueba de concepto.
+La suite externa evalúa el comportamiento funcional producido por los agentes.
 
-Los tests son externos al repositorio utilizado por los agentes y evalúan
-únicamente el comportamiento observable de la API.
+Los tests se encuentran fuera del repositorio utilizado durante el desarrollo.
 
-La suite no evalúa:
+No evalúan:
 
-- estructura interna del código;
+- arquitectura interna;
 - nombres de clases;
 - cantidad de archivos;
-- existencia de documentación SDD;
-- estilo de implementación;
-- tests generados por el agente.
+- estilo;
+- documentación;
+- artefactos SDD;
+- tests internos.
 
-Se evalúa exclusivamente el cumplimiento funcional definido en el ground truth.
+Evalúan exclusivamente comportamiento observable.
 
-## 2. Principio acumulativo
+# 2. Tickets y ground truth
 
-Las versiones se evalúan de manera acumulativa.
+Los tickets representan requerimientos de desarrollo y no especificaciones
+exhaustivas.
 
-### V1
+El ground truth contiene las decisiones funcionales utilizadas para construir la
+suite.
 
-- tests correspondientes a V1.
+Cuando una decisión no resulte evidente a partir del ticket, ambos enfoques
+pueden solicitar aclaraciones.
 
-### V2
+Esto permite observar también la capacidad del proceso para detectar requisitos
+que necesitan definición.
 
-- tests correspondientes a V1;
-- tests nuevos correspondientes a V2.
+# 3. Evaluación acumulativa
 
-### V3
+V1:
 
-- tests correspondientes a V1;
-- tests correspondientes a V2;
-- tests nuevos correspondientes a V3.
+tests V1.
 
-### V4
+V2:
 
-- tests correspondientes a V1;
-- tests correspondientes a V2;
-- tests correspondientes a V3;
-- tests nuevos correspondientes a V4.
+tests V1 + V2.
 
-Esto permite medir dos dimensiones diferentes:
+V3:
 
-1. incorporación correcta del nuevo cambio;
-2. preservación del comportamiento definido en versiones anteriores.
+tests V1 + V2 + V3.
 
-## 3. Resultado del primer intento
+V4:
 
-La primera ejecución de la suite se realiza inmediatamente después de que el
-agente declara terminada una versión.
+tests V1 + V2 + V3 + V4.
 
-Este resultado debe guardarse antes de proporcionar cualquier feedback.
+# 4. First attempt
 
-Se registran:
+La primera ejecución se realiza inmediatamente después de que el agente declara
+terminada una versión.
 
-- tests aprobados;
-- tests totales;
-- cumplimiento funcional;
-- tests anteriores aprobados;
-- preservación del comportamiento previo;
-- tests correspondientes al cambio actual aprobados.
-
-El objetivo es observar qué tan correctamente responde el agente al
-requerimiento antes de recibir correcciones externas.
-
-## 4. Resultado final
-
-Luego de cada ciclo de corrección se vuelve a ejecutar la suite completa.
-
-Se permite un máximo de tres ciclos.
-
-Al finalizar se registra nuevamente:
+Se registra antes de entregar feedback:
 
 - tests aprobados;
-- tests totales;
-- cumplimiento funcional;
+- tests activos;
 - preservación;
-- cumplimiento del cambio nuevo;
-- cantidad de ciclos necesarios.
+- cumplimiento del nuevo cambio.
 
-# 5. Tests de V1
+# 5. Resultado final
+
+Después de cada corrección se ejecuta nuevamente la suite.
+
+Máximo:
+
+3 ciclos.
+
+Se registra:
+
+- cumplimiento final;
+- preservación;
+- cumplimiento del nuevo cambio;
+- ciclos;
+- intervenciones.
+
+# 6. V1
 
 ## Creación y consulta
 
 ### TEST-V1-01
 
-Crear correctamente un cupón porcentual válido.
+Crear cupón porcentual válido.
 
 ### TEST-V1-02
 
-Crear correctamente un cupón de monto fijo válido.
+Crear cupón fijo válido.
 
 ### TEST-V1-03
 
-Rechazar la creación de dos cupones con el mismo código.
+Rechazar código duplicado.
 
 ### TEST-V1-04
 
-Consultar correctamente un cupón existente.
+Consultar cupón existente.
 
 ### TEST-V1-05
 
-Responder correctamente ante un código inexistente.
+Cupón inexistente responde como recurso no encontrado.
 
-## Descuento porcentual
+## Porcentaje
 
 ### TEST-V1-06
 
-Aplicar correctamente un descuento porcentual.
+Aplicar descuento porcentual.
 
 ### TEST-V1-07
 
-Aceptar un porcentaje del 100 % sin producir un total negativo.
+Aceptar porcentaje 100.
 
 ### TEST-V1-08
 
-Rechazar valores porcentuales inválidos.
+Rechazar porcentaje inválido.
 
-## Descuento fijo
+## Monto fijo
 
 ### TEST-V1-09
 
-Aplicar correctamente un descuento fijo.
+Aplicar descuento fijo.
 
 ### TEST-V1-10
 
-Limitar el descuento cuando el monto fijo supera el monto elegible.
+Evitar total negativo.
 
 ## Vigencia
 
 ### TEST-V1-11
 
-Permitir utilizar un cupón dentro de su período de vigencia.
+Aceptar dentro de vigencia.
 
 ### TEST-V1-12
 
-Rechazar un cupón cuya fecha de inicio todavía no ocurrió.
+Rechazar antes del inicio.
 
 ### TEST-V1-13
 
-Rechazar un cupón vencido.
+Rechazar luego del vencimiento.
 
 ### TEST-V1-14
 
-Aceptar exactamente la fecha inicial de vigencia.
+Fecha inicial inclusiva.
 
 ### TEST-V1-15
 
-Aceptar exactamente la fecha final de vigencia.
+Fecha final inclusiva.
 
 ## Monto mínimo
 
 ### TEST-V1-16
 
-Rechazar un cupón cuando el subtotal es inferior al mínimo requerido.
+Rechazar subtotal inferior al mínimo.
 
 ### TEST-V1-17
 
-Aceptar un cupón cuando el subtotal es exactamente igual al monto mínimo.
+Aceptar subtotal igual al mínimo.
 
 ### TEST-V1-18
 
-Verificar que el mínimo se calcule antes de aplicar el descuento.
+Evaluar mínimo antes del descuento.
 
 ## Categorías
 
 ### TEST-V1-19
 
-Aplicar descuento a un carrito compuesto únicamente por categorías permitidas.
+Aplicar descuento a categoría permitida.
 
 ### TEST-V1-20
 
-Aplicar descuento únicamente a productos elegibles cuando el carrito contiene
-categorías permitidas y no permitidas.
+Carrito mixto descuenta solo productos elegibles.
 
 ### TEST-V1-21
 
-Rechazar el cupón cuando ningún producto pertenece a una categoría permitida.
+Rechazar si no existe producto elegible.
 
 ### TEST-V1-22
 
-Aplicar el descuento a todo el carrito cuando el cupón no posee restricciones
-de categoría.
+Sin restricciones aplica a todo el carrito.
 
-## Uso por usuario
+## Uso
 
 ### TEST-V1-23
 
-Permitir el primer uso del cupón.
+Permitir primer uso.
 
 ### TEST-V1-24
 
-Rechazar el segundo uso del mismo cupón por el mismo usuario.
+Rechazar segundo uso en V1.
 
 ### TEST-V1-25
 
-Permitir que otro usuario utilice el mismo cupón.
+Usuarios independientes.
 
 ### TEST-V1-26
 
-Comprobar que un intento de checkout rechazado no consuma un uso.
+Intento fallido no consume uso.
 
-## Compatibilidad con comportamiento previo
+## Compatibilidad
 
 ### TEST-V1-27
 
-Permitir checkout sin cupón.
+Checkout sin cupón funciona.
 
 ### TEST-V1-28
 
-Verificar que subtotal y total sean iguales cuando no existe cupón.
+Subtotal y total iguales sin cupón.
 
 ### TEST-V1-29
 
-Verificar que un checkout exitoso continúe generando una orden.
+Checkout crea orden.
 
 ### TEST-V1-30
 
-Verificar que el carrito continúe vaciándose después de un checkout exitoso.
+Checkout vacía carrito.
 
-# 6. Tests nuevos de V2
+# 7. V2
 
 Todos los tests V1 deben continuar pasando.
 
 ### TEST-V2-01
 
-Rechazar dos usos del mismo cupón por el mismo usuario durante el mismo día.
+Rechazar dos usos el mismo día.
 
 ### TEST-V2-02
 
-Permitir un segundo uso en un día calendario posterior.
+Permitir segundo uso en día posterior.
 
 ### TEST-V2-03
 
-Permitir un tercer uso en otro día posterior.
+Permitir tercer uso.
 
 ### TEST-V2-04
 
-Rechazar un cuarto uso aunque corresponda a un día diferente.
+Rechazar cuarto uso.
 
 ### TEST-V2-05
 
-Mantener el contador de usos independiente entre usuarios.
+Mantener contador independiente entre usuarios.
 
 ### TEST-V2-06
 
-Verificar que un intento fallido no incremente el contador total.
+Intento fallido no incrementa total.
 
 ### TEST-V2-07
 
-Verificar que un intento fallido no bloquee un uso válido posterior durante
-el mismo día.
+Intento fallido no bloquea posterior uso válido del mismo día.
 
-# 7. Tests nuevos de V3
+# 8. V3
 
 Todos los tests V1 y V2 deben continuar pasando.
 
 ### TEST-V3-01
 
-Permitir utilizar un cupón que no posee restricción de usuarios.
+Cupón sin segmentación continúa siendo general.
 
 ### TEST-V3-02
 
-Permitir utilizar un cupón por un usuario incluido en la lista permitida.
+Usuario permitido puede utilizarlo.
 
 ### TEST-V3-03
 
-Rechazar el uso por un usuario no incluido en la lista.
+Usuario no permitido es rechazado.
 
 ### TEST-V3-04
 
-Verificar que un rechazo por usuario no autorizado no consuma un uso.
+Rechazo por autorización no consume uso.
 
 ### TEST-V3-05
 
-Verificar que un usuario autorizado deba igualmente cumplir la vigencia.
+Usuario permitido sigue sujeto a vigencia.
 
 ### TEST-V3-06
 
-Verificar que un usuario autorizado deba igualmente cumplir el monto mínimo.
+Usuario permitido sigue sujeto a mínimo.
 
 ### TEST-V3-07
 
-Verificar que un usuario autorizado deba igualmente cumplir las restricciones
-por categoría.
+Usuario permitido sigue sujeto a categorías.
 
 ### TEST-V3-08
 
-Verificar que un usuario autorizado continúe sujeto al máximo de un uso diario.
+Usuario permitido sigue sujeto a límite diario.
 
 ### TEST-V3-09
 
-Verificar que un usuario autorizado continúe sujeto al límite total de tres usos.
+Usuario permitido sigue sujeto a límite total.
 
-# 8. Tests nuevos de V4
+# 9. V4
 
-Todos los tests V1, V2 y V3 deben continuar pasando.
+Todos los tests V1-V3 deben continuar pasando.
 
-V4 incorpora evolución temporal y revisiones parciales de la configuración de
-un mismo cupón.
-
-## Actualizaciones parciales
+## Actualización parcial
 
 ### TEST-V4-01
 
-Verificar que un PATCH parcial conserve los campos que no fueron modificados.
+PATCH parcial conserva campos omitidos.
 
 ### TEST-V4-02
 
-Rechazar un intento de modificar el código del cupón.
+Código inmutable.
 
 ### TEST-V4-03
 
-Aplicar inmediatamente una modificación del descuento.
+Cambio inmediato de descuento.
 
 ### TEST-V4-04
 
-Aplicar inmediatamente una modificación del monto mínimo.
+Cambio inmediato de mínimo.
 
 ### TEST-V4-05
 
-Aplicar inmediatamente una modificación de las categorías permitidas.
+Cambio inmediato de categorías.
 
 ### TEST-V4-06
 
-Aplicar inmediatamente una modificación de los usuarios permitidos.
+Cambio inmediato de usuarios.
 
-## Revisiones futuras
+## Revisiones temporales
 
 ### TEST-V4-07
 
-Verificar que una revisión futura no afecte el comportamiento antes de su
-`effectiveFrom`.
+Cambio futuro no se aplica antes de effectiveFrom.
 
 ### TEST-V4-08
 
-Verificar que una revisión comience a aplicarse exactamente al alcanzar su
-`effectiveFrom`.
+Cambio se aplica exactamente en effectiveFrom.
 
 ## Activación
 
 ### TEST-V4-09
 
-Rechazar el uso de un cupón cuya configuración efectiva posea `active=false`.
+active=false bloquea uso.
 
 ### TEST-V4-10
 
-Permitir nuevamente el uso después de una revisión que reactive el cupón.
+Reactivación permite uso.
 
 ### TEST-V4-11
 
-Verificar que desactivar y posteriormente reactivar un cupón no elimine su
-historial de usos.
+Desactivar y reactivar conserva historial.
 
 ## Límite configurable
 
 ### TEST-V4-12
 
-Verificar que `maxUsesPerUser` modifique el límite total de utilizaciones.
+maxUsesPerUser modifica máximo.
 
 ### TEST-V4-13
 
-Verificar que reducir `maxUsesPerUser` considere las utilizaciones históricas
-realizadas antes del cambio.
+Reducir máximo considera historial.
 
-## Preservación del historial
+## Historial y compatibilidad
 
 ### TEST-V4-14
 
-Verificar que crear una nueva revisión no reinicie el límite de una utilización
-por día.
+Nueva revisión no reinicia límite diario.
 
 ### TEST-V4-15
 
-Verificar que un cupón creado con el contrato anterior continúe funcionando sin
-necesidad de revisiones.
+Cupón sin revisiones continúa siendo compatible.
 
 ## Línea temporal compleja
 
 ### TEST-V4-16
 
-Verificar que dos revisiones futuras parciales acumulen correctamente sus
-modificaciones.
+Revisiones parciales futuras acumulan cambios.
 
 ### TEST-V4-17
 
-Verificar que el resultado de las revisiones dependa de su orden cronológico y
-no del orden en que fueron creadas.
+Orden cronológico prevalece sobre orden de creación.
 
 ### TEST-V4-18
 
-Verificar que insertar posteriormente una revisión entre dos revisiones futuras
-ya existentes mantenga correctamente la herencia de configuración a lo largo de
-la línea temporal.
+Inserción de revisión intermedia conserva herencia temporal.
 
 ### TEST-V4-19
 
-Verificar que reglas originadas en diferentes versiones de la funcionalidad
-puedan combinarse correctamente después de varias revisiones temporales.
-
-La configuración efectiva debe poder combinar, entre otras reglas:
-
-- descuento;
-- monto mínimo;
-- categorías;
-- usuarios permitidos.
+Reglas originadas en diferentes versiones se combinan.
 
 ### TEST-V4-20
 
-Verificar que el historial total de utilización del cupón permanezca intacto a
-través de múltiples revisiones sucesivas.
+Historial permanece intacto entre múltiples revisiones.
 
-# 9. Cantidad esperada de tests activos
+# 10. Cantidad de tests
 
-### V1
+V1:
 
-30 tests funcionales.
+30
 
-### V2
+V2:
 
-30 V1 + 7 V2 = **37 tests funcionales acumulativos**.
+37 acumulativos.
 
-### V3
+V3:
 
-30 V1 + 7 V2 + 9 V3 = **46 tests funcionales acumulativos**.
+46 acumulativos.
 
-### V4
+V4:
 
-30 V1 + 7 V2 + 9 V3 + 20 V4 =
-**66 tests funcionales acumulativos**.
+66 acumulativos.
 
-Además existen 2 tests correspondientes a V0/infraestructura.
+Infraestructura:
 
-Por lo tanto, la colección completa del evaluador contiene:
+2.
 
-**68 tests totales**
+Colección completa:
 
-de los cuales:
+68.
 
-- 2 corresponden a V0/infraestructura;
-- 66 corresponden a la evaluación funcional acumulativa V1-V4.
+# 11. Métricas
 
-# 10. Métricas derivadas
+## Cumplimiento
 
-## Cumplimiento funcional
+`tests aprobados / tests activos`
 
-Cumplimiento:
-
-`tests activos aprobados / tests activos totales`
-
-## Preservación
-
-### V2
-
-Preservación:
+## Preservación V2
 
 `tests V1 aprobados / 30`
 
-### V3
+## Preservación V3
 
-Preservación:
+`tests V1-V2 aprobados / 37`
 
-`tests V1 y V2 aprobados / 37`
+## Preservación V4
 
-### V4
+`tests V1-V3 aprobados / 46`
 
-Preservación:
+## Cambio V2
 
-`tests V1, V2 y V3 aprobados / 46`
+`tests V2 aprobados / 7`
 
-## Cumplimiento del cambio nuevo
+## Cambio V3
 
-También se registra separadamente:
+`tests V3 aprobados / 9`
 
-`tests de la versión actual aprobados / tests de la versión actual totales`
+## Cambio V4
 
-Por lo tanto:
+`tests V4 aprobados / 20`
 
-- V2: tests nuevos aprobados / 7;
-- V3: tests nuevos aprobados / 9;
-- V4: tests nuevos aprobados / 20.
+# 12. Interpretación
 
-Esto permite distinguir entre:
+La suite permite distinguir entre:
 
-- implementar correctamente el cambio nuevo;
-- conservar correctamente el comportamiento anterior.
+- implementación del nuevo requerimiento;
+- preservación del comportamiento previo.
 
-# 11. Evaluación específica de V4
+Los resultados se combinan con:
 
-V4 constituye la evolución de mayor complejidad del experimento.
+- aclaraciones;
+- intervenciones;
+- correcciones;
+- tiempo.
 
-Además de incorporar nuevas capacidades, obliga a preservar y combinar reglas
-introducidas en versiones anteriores.
-
-Se analizará especialmente:
-
-- preservación de los 46 tests V1-V3;
-- cumplimiento de los 20 tests nuevos;
-- comportamiento ante revisiones creadas fuera de orden;
-- acumulación de modificaciones parciales;
-- conservación del historial;
-- interacción entre reglas provenientes de diferentes versiones.
-
-Esto permite evaluar si el contexto acumulado durante la evolución de la
-funcionalidad adquiere mayor importancia cuando aumenta la cantidad de reglas e
-interacciones que deben mantenerse simultáneamente.
-
-# 12. Relación con el objetivo experimental
-
-La comparación no se limita al resultado final.
-
-Se observa la evolución de las métricas entre:
-
-`V1 -> V2 -> V3 -> V4`
-
-Especialmente:
-
-- cumplimiento en primer intento;
-- preservación en primer intento;
-- cumplimiento del cambio nuevo;
-- ciclos de corrección;
-- intervenciones humanas;
-- tiempo requerido.
-
-V1, V2 y V3 permiten observar evoluciones progresivas relativamente acotadas.
-
-V4 introduce una evolución transversal que requiere interpretar y mantener
-simultáneamente reglas originadas en distintas etapas anteriores.
-
-Esto permite analizar si el contexto estructurado y persistente utilizado por
-SDD aporta mayor utilidad a medida que aumenta la complejidad evolutiva de la
-funcionalidad.
+Los artefactos SDD no son evaluados directamente por esta suite.
