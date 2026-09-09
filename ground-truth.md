@@ -150,12 +150,12 @@ Debe continuar:
 
 ## 4.9. Respuesta
 
-Un checkout exitoso con cupón debe permitir conocer:
+Un checkout exitoso con cupón debe incluir:
 
-- subtotal;
-- descuento;
-- total;
-- código del cupón utilizado.
+- `subtotal`;
+- `discount`;
+- `total`;
+- `couponCode`.
 
 Los importes monetarios pueden utilizar redondeo convencional.
 
