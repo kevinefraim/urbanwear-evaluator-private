@@ -405,3 +405,21 @@ Los resultados deben interpretarse dentro de las limitaciones de la experiencia:
 
 Los resultados representan evidencia del comportamiento observado en esta POC,
 no una demostración de superioridad general de uno de los enfoques.
+
+Otro aspecto relevante es el tamaño reducido del caso de estudio. UrbanWear
+posee una base de código acotada, lo que permitió que el agente inspeccionara
+rápidamente la implementación existente y reconstruyera desde el propio código
+gran parte del comportamiento acumulado.
+
+Aun bajo estas condiciones, el enfoque SDD mostró una tendencia a explicitar
+una mayor cantidad de decisiones ambiguas antes de implementar: realizó 15
+aclaraciones frente a 3 del enfoque Prompt-Driven.
+
+En una base de código de mayor tamaño, el desafío no consiste únicamente en
+conservar información, sino también en localizar qué información resulta
+relevante para una modificación. En ese escenario, los artefactos persistentes
+de SDD podrían actuar como un punto de entrada estructurado hacia los requisitos,
+decisiones y componentes relacionados con una funcionalidad, reduciendo la
+necesidad de reconstruir ese contexto exclusivamente mediante la inspección del
+código. Esta posible ventaja requiere ser evaluada en trabajos futuros con
+sistemas de mayor escala.
