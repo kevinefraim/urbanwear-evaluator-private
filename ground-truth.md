@@ -599,3 +599,11 @@ Total:
 Para aplicar el límite diario se utiliza el día calendario en UTC.
 
 El instante controlado mediante `TEST_NOW` determina el día correspondiente.
+
+## maxUsesPerUser - validación
+
+`maxUsesPerUser` debe ser un entero positivo.
+
+Valor mínimo permitido:
+
+`1`
