@@ -1,4 +1,4 @@
-# Ground Truth Privado - UrbanWear
+# Referencia de evaluación privada - UrbanWear
 
 > IMPORTANTE:
 >
@@ -20,7 +20,7 @@ Se utiliza para:
 - resolver ambigüedades;
 - mantener el mismo criterio entre Prompt-Driven y SDD.
 
-El ground truth no constituye entrada del agente.
+La referencia de evaluación no constituye una entrada para el agente.
 
 # 2. Política de aclaraciones
 

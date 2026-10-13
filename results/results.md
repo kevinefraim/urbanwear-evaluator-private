@@ -5,10 +5,10 @@
 La POC comparó dos estrategias de desarrollo asistido por inteligencia
 artificial para la evolución progresiva de una misma funcionalidad:
 
-- Prompt-Driven Development;
-- Spec-Driven Development (SDD).
+- Desarrollo guiado por prompts;
+- Desarrollo guiado por especificaciones (SDD).
 
-Ambas trayectorias comenzaron desde el mismo baseline V0 de UrbanWear y
+Ambas trayectorias comenzaron desde la misma base V0 de UrbanWear y
 recibieron los mismos tickets funcionales para V1, V2, V3 y V4.
 
 Cada versión se ejecutó en una nueva conversación con el agente.
@@ -37,8 +37,8 @@ Además existieron 2 tests de infraestructura correspondientes a V0.
 ### 2.1. V1
 
 - Tiempo inicial: ~5 min
-- First attempt: 29/30
-- Cumplimiento first attempt: 96.67%
+- Primer intento: 29/30
+- Cumplimiento del primer intento: 96.67%
 - Aclaraciones: 0
 - Intervenciones humanas: 1
 - Ciclos de corrección: 1
@@ -58,8 +58,8 @@ comportamiento en un ciclo y alcanzó el 100% de cumplimiento.
 ### 2.2. V2
 
 - Tiempo inicial: ~5 min
-- First attempt: 37/37
-- Cumplimiento first attempt: 100%
+- Primer intento: 37/37
+- Cumplimiento del primer intento: 100%
 - Preservación V1: 30/30
 - Cumplimiento del cambio V2: 7/7
 - Aclaraciones: 3
@@ -86,8 +86,8 @@ V1.
 ### 2.3. V3
 
 - Tiempo inicial: ~4 min
-- First attempt: 46/46
-- Cumplimiento first attempt: 100%
+- Primer intento: 46/46
+- Cumplimiento del primer intento: 100%
 - Preservación V1-V2: 37/37
 - Cumplimiento del cambio V3: 9/9
 - Aclaraciones: 0
@@ -105,8 +105,8 @@ se produjeron regresiones.
 ### 2.4. V4
 
 - Tiempo inicial: ~7 min
-- First attempt: 66/66
-- Cumplimiento first attempt: 100%
+- Primer intento: 66/66
+- Cumplimiento del primer intento: 100%
 - Preservación V1-V3: 46/46
 - Cumplimiento del cambio V4: 20/20
 - Aclaraciones: 0
@@ -124,13 +124,13 @@ composición de reglas anteriores.
 
 No fueron necesarias aclaraciones ni correcciones.
 
-## 3. Resultados Spec-Driven Development
+## 3. Resultados del desarrollo guiado por especificaciones
 
 ### 3.1. V1
 
 - Tiempo inicial: ~7 min
-- First attempt: 28/30
-- Cumplimiento first attempt: 93.33%
+- Primer intento: 28/30
+- Cumplimiento del primer intento: 93.33%
 - Aclaraciones: 5
 - Intervenciones humanas: 4
 - Ciclos de corrección: 2
@@ -148,7 +148,7 @@ Antes de implementar, el agente solicitó aclaraciones sobre:
 
 Estas decisiones fueron incorporadas a los artefactos SDD.
 
-Sin embargo, el first attempt presentó dos fallos:
+Sin embargo, el primer intento presentó dos fallos:
 
 1. se aceptó un descuento porcentual superior a 100%;
 2. `validUntil` no fue considerado inclusivo.
@@ -164,8 +164,8 @@ El resultado final fue 30/30.
 ### 3.2. V2
 
 - Tiempo inicial: ~5 min
-- First attempt: 37/37
-- Cumplimiento first attempt: 100%
+- Primer intento: 37/37
+- Cumplimiento del primer intento: 100%
 - Preservación V1: 30/30
 - Cumplimiento del cambio V2: 7/7
 - Aclaraciones: 3
@@ -189,8 +189,8 @@ La implementación obtuvo 37/37 en el primer intento.
 ### 3.3. V3
 
 - Tiempo inicial: ~4 min
-- First attempt: 46/46
-- Cumplimiento first attempt: 100%
+- Primer intento: 46/46
+- Cumplimiento del primer intento: 100%
 - Preservación V1-V2: 37/37
 - Cumplimiento del cambio V3: 9/9
 - Aclaraciones: 0
@@ -207,8 +207,8 @@ No fueron necesarias aclaraciones ni correcciones.
 ### 3.4. V4
 
 - Tiempo inicial: ~5 min
-- First attempt: 66/66
-- Cumplimiento first attempt: 100%
+- Primer intento: 66/66
+- Cumplimiento del primer intento: 100%
 - Preservación V1-V3: 46/46
 - Cumplimiento del cambio V4: 20/20
 - Aclaraciones: 7
@@ -236,7 +236,7 @@ completamente el comportamiento anterior.
 
 ## 4. Comparación por versión
 
-| Versión | Prompt first attempt | SDD first attempt | Prompt final | SDD final |
+| Versión | Prompt: primer intento | SDD: primer intento | Prompt: resultado final | SDD: resultado final |
 | ------- | -------------------: | ----------------: | -----------: | --------: |
 | V1      |       29/30 (96.67%) |    28/30 (93.33%) |        30/30 |     30/30 |
 | V2      |         37/37 (100%) |      37/37 (100%) |        37/37 |     37/37 |
@@ -284,7 +284,7 @@ implementación para solicitar definiciones antes de consolidar la
 especificación.
 
 Sin embargo, la mayor cantidad de aclaraciones no se tradujo automáticamente en
-un mayor cumplimiento funcional: en V1 el first attempt de SDD obtuvo un test
+un mayor cumplimiento funcional: en V1 el primer intento de SDD obtuvo una prueba
 menos que Prompt-Driven.
 
 ## 8. Tiempo registrado
@@ -301,12 +301,12 @@ Los valores representan el tiempo aproximado de trabajo del agente registrado
 durante las ejecuciones y ciclos de corrección.
 
 No incluyen una medición precisa del costo computacional interno ni deben
-interpretarse como benchmarks de rendimiento del modelo.
+interpretarse como comparativas de rendimiento del modelo.
 
 En el total acumulado no se observó una diferencia temporal relevante entre
 ambos enfoques, aunque la distribución fue diferente.
 
-SDD presentó mayor overhead inicial en V1, mientras que V4 fue completada en
+SDD presentó mayor sobrecarga inicial en V1, mientras que V4 fue completada en
 menos tiempo registrado que la trayectoria Prompt-Driven.
 
 ## 9. Síntesis comparativa
@@ -314,7 +314,7 @@ menos tiempo registrado que la trayectoria Prompt-Driven.
 Los dos enfoques alcanzaron finalmente el 100% de cumplimiento funcional en
 todas las versiones.
 
-Prompt-Driven obtuvo un mejor resultado en el first attempt de V1:
+Prompt-Driven obtuvo un mejor resultado en el primer intento de V1:
 
 - Prompt: 29/30;
 - SDD: 28/30.
@@ -370,7 +370,7 @@ desarrollar y evolucionar exitosamente la funcionalidad de cupones.
 
 Prompt-Driven resultó suficiente para preservar el comportamiento funcional a
 lo largo de las cuatro versiones y presentó resultados equivalentes o
-superiores en first attempt.
+superiores en el primer intento.
 
 SDD no produjo una mejora funcional cuantitativa sobre la suite de aceptación,
 pero generó un conjunto persistente y estructurado de requisitos, decisiones,

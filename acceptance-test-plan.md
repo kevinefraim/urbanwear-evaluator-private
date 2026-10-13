@@ -18,13 +18,13 @@ No evalúan:
 
 Evalúan exclusivamente comportamiento observable.
 
-# 2. Tickets y ground truth
+# 2. Tickets y referencia de evaluación
 
 Los tickets representan requerimientos de desarrollo y no especificaciones
 exhaustivas.
 
-El ground truth contiene las decisiones funcionales utilizadas para construir la
-suite.
+La referencia de evaluación contiene las decisiones funcionales utilizadas para
+construir la suite.
 
 Cuando una decisión no resulte evidente a partir del ticket, ambos enfoques
 pueden solicitar aclaraciones.
@@ -50,12 +50,12 @@ V4:
 
 tests V1 + V2 + V3 + V4.
 
-# 4. First attempt
+# 4. Primer intento
 
 La primera ejecución se realiza inmediatamente después de que el agente declara
 terminada una versión.
 
-Se registra antes de entregar feedback:
+Se registra antes de entregar comentarios:
 
 - tests aprobados;
 - tests activos;

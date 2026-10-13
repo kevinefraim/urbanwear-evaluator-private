@@ -1,26 +1,27 @@
 # UrbanWear Evaluator POC
 
-Evaluation materials for the UrbanWear specification-driven development POC.
-The repository records the acceptance strategy, versioned input briefs,
-automated acceptance tests, experiment protocol, and observed results for the
-coupon evolutions V1 through V4.
+Materiales de evaluación para la POC de desarrollo guiado por especificaciones
+de UrbanWear. El repositorio registra la estrategia de aceptación, los briefs
+de entrada versionados, las pruebas de aceptación automatizadas, el protocolo
+experimental y los resultados observados de las evoluciones de cupones V1 a V4.
 
-> This repository is public. Its evaluation criteria and ground-truth material
-> are intentionally included for transparent review of the POC.
+> Este repositorio es público. Sus criterios de evaluación y material de
+> referencia se incluyen deliberadamente para permitir una revisión transparente
+> de la POC.
 
-## Contents
+## Contenido
 
-- [`input-briefs/`](input-briefs/): briefs provided for each version.
-- [`tests/`](tests/): automated acceptance tests.
-- [`ground-truth.md`](ground-truth.md): expected product behavior used for
-  evaluation.
-- [`acceptance-test-plan.md`](acceptance-test-plan.md): test plan and metrics.
-- [`experiment-protocol.md`](experiment-protocol.md): experimental procedure.
-- [`results/`](results/): generated specifications, prompts, and results.
+- [`input-briefs/`](input-briefs/): briefs provistos para cada versión.
+- [`tests/`](tests/): pruebas de aceptación automatizadas.
+- [`ground-truth.md`](ground-truth.md): comportamiento esperado del producto
+  utilizado para la evaluación.
+- [`acceptance-test-plan.md`](acceptance-test-plan.md): plan de pruebas y métricas.
+- [`experiment-protocol.md`](experiment-protocol.md): procedimiento experimental.
+- [`results/`](results/): especificaciones, prompts y resultados generados.
 
-## Run the tests
+## Ejecutar las pruebas
 
-Create a Python environment, install the dependencies, and run pytest:
+Crear un entorno de Python, instalar las dependencias y ejecutar pytest:
 
 ```bash
 python -m venv .venv
@@ -29,5 +30,5 @@ pip install -r requirements.txt
 pytest
 ```
 
-The tests expect the UrbanWear application to be available according to the
-configuration in [`tests/conftest.py`](tests/conftest.py).
+Las pruebas esperan que la aplicación UrbanWear esté disponible según la
+configuración de [`tests/conftest.py`](tests/conftest.py).

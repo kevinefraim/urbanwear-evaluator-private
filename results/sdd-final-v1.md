@@ -2,69 +2,69 @@
 
 ## Ejecución
 
-- Approach: Spec-Driven Development
-- Version: V1
-- Start time: 2026-09-09 20:15
-- First attempt completed at: 2026-09-09 20:22
-- First attempt duration: ~7 min
+- Enfoque: Desarrollo guiado por especificaciones
+- Versión: V1
+- Hora de inicio: 2026-09-09 20:15
+- Primer intento completado: 2026-09-09 20:22
+- Duración del primer intento: ~7 min
 
-## First attempt
+## Primer intento
 
-- Tests passed: 28
-- Tests total: 30
-- Compliance: 93.33%
-- Clarifications: 5
-- Human interventions: 2
+- Pruebas aprobadas: 28
+- Total de pruebas: 30
+- Cumplimiento: 93.33%
+- Aclaraciones: 5
+- Intervenciones humanas: 2
 
-### Failures
+### Fallos
 
 1. `TEST-V1-08`: se aceptó un cupón porcentual con valor 101.
 2. `TEST-V1-15`: `validUntil` no fue tratado como inclusivo.
 
-## Correction cycle 1
+## Ciclo de corrección 1
 
-- Start time: 2026-09-09 20:25
-- Completed at: 2026-09-09 20:26
-- Duration: ~1 min
-- Result: 29/30
+- Hora de inicio: 2026-09-09 20:25
+- Completado: 2026-09-09 20:26
+- Duración: ~1 min
+- Resultado: 29/30
 
 Se corrigió el rango permitido para cupones porcentuales.
 
 Continuó fallando la interpretación inclusiva de `validUntil`.
 
-## Correction cycle 2
+## Ciclo de corrección 2
 
-- Start time: 2026-09-09 20:29
-- Completed at: 2026-09-09 20:30
-- Duration: ~1 min
-- Result: 30/30
+- Hora de inicio: 2026-09-09 20:29
+- Completado: 2026-09-09 20:30
+- Duración: ~1 min
+- Resultado: 30/30
 
 Se corrigió la semántica de `validUntil` para considerar válida la fecha
 completa indicada como límite final.
 
-## Final
+## Resultado final
 
-- Tests passed: 30
-- Tests total: 30
-- Compliance: 100%
-- Clarifications: 5
-- Human interventions: 4
-- Correction cycles: 2
+- Pruebas aprobadas: 30
+- Total de pruebas: 30
+- Cumplimiento: 100%
+- Aclaraciones: 5
+- Intervenciones humanas: 4
+- Ciclos de corrección: 2
 
-## Time
+## Tiempo
 
-- Initial implementation: ~7 min
-- Correction cycle 1: ~1 min
-- Correction cycle 2: ~1 min
-- Agent work time recorded: ~9 min
+- Implementación inicial: ~7 min
+- Ciclo de corrección 1: ~1 min
+- Ciclo de corrección 2: ~1 min
+- Tiempo de trabajo registrado del agente: ~9 min
 
-## Observations
+## Observaciones
 
 El enfoque SDD realizó cinco aclaraciones de requisitos antes de completar la
 primera implementación y persistió las decisiones obtenidas en sus artefactos
 de especificación.
 
-Sin embargo, el first attempt obtuvo 28/30 tests. Las dos reglas no cubiertas
+Sin embargo, el primer intento obtuvo 28/30 pruebas. Las dos reglas no cubiertas
 correctamente fueron el rango válido de descuentos porcentuales y la
 inclusividad de `validUntil`.
 

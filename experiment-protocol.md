@@ -6,7 +6,7 @@ El experimento compara dos formas de desarrollar y evolucionar una misma
 funcionalidad utilizando un agente de inteligencia artificial:
 
 1. Prompt-Driven;
-2. Spec-Driven Development (SDD).
+2. Desarrollo guiado por especificaciones (SDD).
 
 El objetivo es analizar si disponer de contexto estructurado y persistente
 mediante SDD aporta valor a medida que una funcionalidad acumula cambios y reglas
@@ -61,7 +61,7 @@ Los tickets describen:
 
 No constituyen especificaciones exhaustivas.
 
-No incluyen todos los edge cases utilizados por la evaluación externa.
+No incluyen todos los casos límite utilizados por la evaluación externa.
 
 # 5. Enfoque Prompt-Driven
 
@@ -122,7 +122,7 @@ Ambos enfoques utilizan:
 - misma configuración de razonamiento;
 - mismo modo de aprobación;
 - mismos tickets;
-- mismo ground truth;
+- misma referencia de evaluación;
 - misma suite externa;
 - mismas dependencias;
 - misma posibilidad de solicitar aclaraciones;
@@ -164,7 +164,7 @@ No se proporcionan aclaraciones proactivamente.
 
 # 11. Ambigüedad no prevista
 
-Si aparece una decisión no definida en el ground truth:
+Si aparece una decisión no definida en la referencia de evaluación:
 
 1. se detiene la ejecución;
 2. se define una regla neutral;
@@ -182,7 +182,7 @@ Incluye:
 
 - aclaraciones;
 - respuestas a preguntas;
-- feedback del evaluador;
+- comentarios del evaluador;
 - solicitudes de corrección.
 
 Las aprobaciones automáticas de herramientas no cuentan.
@@ -204,7 +204,7 @@ La suite de aceptación reside fuera del repositorio utilizado por el agente.
 El agente no conoce:
 
 - tests;
-- ground truth;
+- referencia de evaluación;
 - resultados esperados;
 - resultados del otro enfoque.
 
@@ -234,17 +234,17 @@ La colección completa contiene:
 
 68 tests.
 
-# 16. First attempt
+# 16. Primer intento
 
 Cuando el agente declara terminada la versión:
 
-1. no se le proporciona feedback;
+1. no se le proporcionan comentarios;
 2. se registra la hora;
 3. se crea un commit;
 4. se crea un tag `first`;
 5. se ejecuta la suite externa.
 
-Ese resultado constituye el first attempt.
+Ese resultado constituye el primer intento.
 
 # 17. Ciclos de corrección
 
@@ -252,7 +252,7 @@ Si existen fallos, se permiten hasta tres ciclos de corrección.
 
 Cada ciclo consiste en:
 
-1. proporcionar feedback;
+1. proporcionar comentarios;
 2. permitir al agente modificar su solución;
 3. ejecutar nuevamente el evaluador.
 
@@ -317,7 +317,7 @@ Cantidad total de mensajes posteriores al requerimiento inicial.
 
 ## 19.7. Ciclos de corrección
 
-Cantidad de ciclos necesarios luego del first attempt.
+Cantidad de ciclos necesarios luego del primer intento.
 
 ## 19.8. Tiempo
 
@@ -368,10 +368,10 @@ evolución.
 
 Si se detecta un defecto en la suite:
 
-puede corregirse únicamente antes de entregar feedback al agente y siempre que:
+puede corregirse únicamente antes de entregar comentarios al agente y siempre que:
 
 - el test penalice un comportamiento válido;
-- el ground truth no exija el comportamiento;
+- la referencia de evaluación no exija el comportamiento;
 - la corrección se aplique a ambos enfoques.
 
 Debe documentarse.
@@ -383,7 +383,7 @@ No cuenta como ciclo de corrección del agente.
 Se utilizan commits y tags para registrar:
 
 - V0;
-- first attempt;
+- primer intento;
 - estado final.
 
 Ejemplo:
